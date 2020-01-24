@@ -5,12 +5,20 @@ using UnityEngine;
 
 public class Znak : MonoBehaviour
 {
+    protected const int notes_per_line = 30;
+    protected const float nota_width = 4.4f;
+    protected const float linka_height = 4.4f;
+    protected const float nota_height = 4.4f;
+
     protected int delka = 1;
 
     public Holder master;
 
     protected Znak prev;
     protected Znak next;
+
+    protected int pos_x = 0;
+    protected int pos_y = 0;
 
     public Znak Prev { get => prev; set => prev = value; }
     public Znak Next { get => next; set => next = value; }
@@ -20,11 +28,32 @@ public class Znak : MonoBehaviour
         delka = Z.delka;
     }
 
+    public virtual void Calc_Pos()
+    {
+        gameObject.transform.up = gameObject.transform.up - new Vector3(0, pos_y * linka_height);
+        gameObject.transform.right = gameObject.transform.right + new Vector3(0, pos_x * nota_width); ;
+    }
+
     public virtual void Calc_Pos(int line_id, int nota_id)
     {
-        gameObject.transform.up = gameObject.transform.up - new Vector3(0, line_id*4.4f);
-        gameObject.transform.right = gameObject.transform.right + new Vector3(0, nota_id * 4.4f); ;
+        pos_x = nota_id;
+        pos_y = line_id;
+        gameObject.transform.up = gameObject.transform.up - new Vector3(0, line_id* linka_height);
+        gameObject.transform.right = gameObject.transform.right + new Vector3(0, nota_id * nota_width); ;
     }
+
+    public void Swap_Pos(Znak target)
+    {
+        int tmp_x = target.pos_x;
+        int tmp_y = target.pos_y;
+        target.pos_x = pos_x;
+        target.pos_y = pos_y;
+        pos_x = tmp_x;
+        pos_y = tmp_y;
+        Calc_Pos();
+        target.Calc_Pos();
+    }
+
 
     public virtual bool is_nota()
     {
@@ -56,9 +85,8 @@ public class Znak : MonoBehaviour
         return "Z,"+delka+";";
     }
 
-    public virtual bool FromString(string input, Holder hold)
+    public virtual bool FromString(string input)
     {
-        master = hold;
         bool error = false;
         char[] filter = new char[1];
         filter[0] = ',';
@@ -83,7 +111,43 @@ public class Znak : MonoBehaviour
         return error;
     }
 
-    
+    public void Transfer(Znak target)
+    {
+        Prev = target.Prev;
+        Next = target.Next;
+        if (target.Prev != null)
+        {
+            target.Prev.Next = this;
+        }
+        if (target.Next != null)
+        {
+            target.Next.Prev = this;
+        }
+        master = target.master;
+        pos_x = target.pos_x;
+        pos_y = target.pos_y;
+    }
+
+    public void Transfer_pos(Znak target)
+    {
+        pos_x = target.pos_x;
+        pos_y = target.pos_y;
+        Calc_Pos();
+    }
+
+    public bool Bump_pos()
+    {
+        bool output = false;
+        pos_x++;
+        if (pos_x > notes_per_line)
+        {
+            pos_x = pos_x - notes_per_line;
+            pos_y++;
+            output = true;
+        }
+        Calc_Pos();
+        return output;
+    }
 
     void Start() { }
     void Update() { }
@@ -95,10 +159,18 @@ public class Nota : Znak
     int prefix = 0;// 0= nic 1 = krizky 2 = becka 3 = cista 
     int postfix = 0;// 0 = nic 1 az 3 tecky(prida pulku delky)
 
+    public override void Calc_Pos()
+    {
+        gameObject.transform.up = gameObject.transform.up - new Vector3(0, pos_y * linka_height) + new Vector3(0, vyska * nota_height);
+        gameObject.transform.right = gameObject.transform.right + new Vector3(0, pos_x * nota_width); ;
+    }
+
     public override void Calc_Pos(int line_id, int nota_id)
     {
-        gameObject.transform.up = gameObject.transform.up;
-        gameObject.transform.right = gameObject.transform.right;
+        pos_x = nota_id;
+        pos_y = line_id;
+        gameObject.transform.up = gameObject.transform.up - new Vector3(0, line_id * linka_height) + new Vector3(0, vyska * nota_height);
+        gameObject.transform.right = gameObject.transform.right + new Vector3(0, nota_id * nota_width); ;
     }
 
     public override void Nota_Up(int i = 1)
@@ -121,9 +193,8 @@ public class Nota : Znak
         return true;
     }
 
-    public override bool FromString(string input, Holder hold)
+    public override bool FromString(string input)
     {
-        master = hold;
         bool error = false;
         char[] filter = new char[1];
         filter[0] = ',';
@@ -196,9 +267,8 @@ class Pomlka : Znak
         return false;
     }
 
-    public override bool FromString(string input, Holder hold)
+    public override bool FromString(string input)
     {
-        master = hold;
         bool error = false;
         char[] filter = new char[1];
         filter[0] = ',';

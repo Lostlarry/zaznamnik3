@@ -6,9 +6,9 @@ using UnityEngine.Experimental.UIElements;
 
 public class Hand_Ctrl : MonoBehaviour
 {
-    const int notes_per_line = 30;
 
-    public HUD_ctrl HUD;
+    public HUD_ctrl Select_HUD;
+    public HUD_ctrl End_HUD;
     public GameObject paper;
     public GameObject proto_nota;
     public GameObject proto_linka;
@@ -111,7 +111,7 @@ public class Hand_Ctrl : MonoBehaviour
                                 errors[4] = true;
                                 break;
                             }
-                            errors[6] = (Add_Nota().FromString(data[i], hands[index]) || errors[6]);
+                            errors[6] = (Add_Nota(hands[index]).FromString(data[i]) || errors[6]);
                             break;
 
                         case "P":
@@ -120,7 +120,7 @@ public class Hand_Ctrl : MonoBehaviour
                                 errors[4] = true;
                                 break;
                             }
-                            errors[6] = (Add_Pomlka().FromString(data[i], hands[index]) || errors[6]);
+                            errors[6] = (Add_Pomlka(hands[index]).FromString(data[i]) || errors[6]);
                             break;
 
                         default:
@@ -155,47 +155,6 @@ public class Hand_Ctrl : MonoBehaviour
         }
     }
 
-    Nota Add_Nota(int handid = 0, Znak target = null)
-    {
-        Holder hand;
-        hand = hands[handid];
-        Select_hand(handid);
-        bool middle = true;
-        if (target == null)
-        {
-            target = hand.Posledni;
-            middle = false;
-        }
-        GameObject GO = Instantiate(proto_nota, paper.transform, false);
-        GO.name = "nota " + not;
-        GO.SetActive(true);
-        not++;
-        Nota made = GO.AddComponent<Nota>();
-        made.master = hand;
-        if (target != null)
-        {
-            if (middle)
-            {
-                made.Next = target.Next;
-                Recalc(made.Next);
-            }
-            else
-            {
-                made.master.Posledni = made;
-            }
-            target.Next = made;
-            made.Prev = target; 
-        }
-        else
-        {
-            made.master.Prvni = made;
-            made.master.Posledni = made;
-        }
-        hand.vybrany = made;
-        HUD.Adjust_HUD(GO);
-        return made;
-    }
-
     Nota Add_Nota(Holder hand, Znak target = null)
     {
         Select_hand(hand);
@@ -213,10 +172,10 @@ public class Hand_Ctrl : MonoBehaviour
         made.master = hand;
         if (target != null)
         {
-            if (middle)
+            if (middle && target.Next != null)
             {
                 made.Next = target.Next;
-                Recalc(made.Next);
+                Recalc(made.Next, true);
             }
             else
             {
@@ -224,6 +183,8 @@ public class Hand_Ctrl : MonoBehaviour
             }
             target.Next = made;
             made.Prev = target;
+            made.Transfer_pos(target);
+            made.Bump_pos();
         }
         else
         {
@@ -231,15 +192,14 @@ public class Hand_Ctrl : MonoBehaviour
             made.master.Posledni = made;
         }
         hand.vybrany = made;
-        HUD.Adjust_HUD(GO);
+        Select_HUD.Adjust_HUD(GO);
+        End_HUD.Adjust_HUD(GO);
         return made;
     }
 
-    Pomlka Add_Pomlka(int handid = 0, Znak target = null)
+    Pomlka Add_Pomlka(Holder hand, Znak target = null)
     {
-        Holder hand;
-        hand = hands[handid];
-        Select_hand(handid);
+        Select_hand(hand);
         bool middle = true;
         if (target == null)
         {
@@ -262,7 +222,7 @@ public class Hand_Ctrl : MonoBehaviour
             made.Prev = target;
         }
         hand.vybrany = made;
-        HUD.Adjust_HUD(GO, false);
+        Select_HUD.Adjust_HUD(GO, false);
         return made;
     }
 
@@ -328,7 +288,10 @@ public class Hand_Ctrl : MonoBehaviour
                 Remove();
                 break;
             case 9:
-                Add_Nota();
+                Add_Nota(hands[selected_hand]);
+                break;
+            case 10:
+                Add_line(hands[selected_hand]);
                 break;
             default:
                 Debug.Log("unstandard signal");
@@ -366,8 +329,8 @@ public class Hand_Ctrl : MonoBehaviour
                 target.master.Posledni = swap;
             }
         }
-        Recalc(swap);
-        HUD.Adjust_HUD(target.gameObject);
+        target.Swap_Pos(swap);
+        Select_HUD.Adjust_HUD(target.gameObject);
     }
 
     private void Shift_next(Znak target = null)
@@ -400,8 +363,8 @@ public class Hand_Ctrl : MonoBehaviour
                 target.master.Prvni = swap;
             }
         }
-        Recalc(target);
-        HUD.Adjust_HUD(target.gameObject);
+        target.Swap_Pos(swap);
+        Select_HUD.Adjust_HUD(target.gameObject);
 
     }
 
@@ -456,18 +419,6 @@ public class Hand_Ctrl : MonoBehaviour
         {
             made = target.gameObject.AddComponent<Nota>();
         }
-        made.Prev = target.Prev;
-        made.Next = target.Next;
-        if (target.Prev != null)
-        {
-            target.Prev.Next = made;
-        }
-        if (target.Next != null)
-        {
-            target.Next.Prev = made;
-            Recalc(target.Next);
-        }
-        made.master = target.master;
         made.Load(target);
         Destroy(target);
     }
@@ -550,6 +501,7 @@ public class Hand_Ctrl : MonoBehaviour
         {
             hands[i] = new Holder();
             Add_line(hands[i]);
+            Add_Nota((hands[i]));
         }
     }
 
@@ -583,38 +535,24 @@ public class Hand_Ctrl : MonoBehaviour
             hold.last = LC;
             hold.first = LC;
         }
-        Add_Nota(hold);
     }
 
     void Start(){}
     void Update(){}
 
-    void Recalc(Znak target)
+    void Recalc(Znak target, bool force = false)
     {
-        Znak select = target.master.Prvni;
-        int line_id = 0;
-        int nota_id = 0;
-        while (select != target)
+        while (target.Next != null)
         {
-            nota_id++;
-            if (nota_id > notes_per_line)
-            {
-                nota_id = 0;
-                line_id++;
-            }
-            select = select.Next;
+            target.Transfer_pos(target.Next);
+            target.Calc_Pos();
+            target = target.Next;
         }
-        while (select != null)
+        if (target.Bump_pos())
         {
-            select.Calc_Pos(line_id, nota_id);
-            nota_id++;
-            if (nota_id > notes_per_line)
-            {
-                nota_id = 0;
-                line_id++;
-            }
-            select = select.Next;
+            Add_line(target.master);
         }
+
     }
 }
 

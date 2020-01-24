@@ -10,27 +10,8 @@ public class Line_Ctrl : MonoBehaviour
     public GameObject klic;
     public GameObject end;
 
-    int id = -1;
-
     public Line_Ctrl Next { get => next; set => next = value; }
     public Line_Ctrl Prev { get => prev; set => prev = value; }
-
-    public int Id 
-    {
-        get
-        {
-            return id;
-        }
-        set
-        {
-            if (id == -1)
-            {
-                id = value;
-            }
-        }
-
-       
-    }
 
     public void Prepare_Destroy()
     {
