@@ -14,7 +14,7 @@ public class HUD_ctrl : MonoBehaviour
     {
         if (select)
         {
-            this.gameObject.transform.localPosition = default_pos + target.transform.localPosition;
+            gameObject.transform.position = target.transform.position;
             for (int i = 0; i < toggle_able.GetLength(0); i++)
             {
                 toggle_able[i].SetActive(toggle);
@@ -22,13 +22,16 @@ public class HUD_ctrl : MonoBehaviour
         }
         else
         {
-            Vector3 tmp = target.transform.localPosition;
-            if(target.GetComponent<Znak>().Bump_pos())
+            Znak tmp = target.GetComponent<Znak>();
+            int tmp_x = tmp.Pos_x;
+            int tmp_y = tmp.Pos_y;
+            tmp_x++;
+            if (tmp_x > Znak.notes_per_line)
             {
-                CTRL.Relay_signal(10);
+                tmp_x = tmp_x - Znak.notes_per_line;
+                tmp_y++;
             }
-            this.gameObject.transform.localPosition = default_pos + target.transform.localPosition;
-            target.transform.localPosition = tmp;
+            gameObject.transform.position = default_pos + new Vector3(tmp_x * Znak.nota_width, - tmp_y * Znak.linka_height, 0);
         }
     }
 
@@ -42,13 +45,13 @@ public class HUD_ctrl : MonoBehaviour
 
     public Vector3 Get_Pos()
     {
-        return transform.localPosition - default_pos;
+        return gameObject.transform.position;
     }
     
     // Start is called before the first frame update
     void Start()
     {
-        default_pos = transform.localPosition;
+        default_pos = gameObject.transform.position;
     }
 
     // Update is called once per frame

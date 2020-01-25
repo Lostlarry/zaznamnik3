@@ -6,6 +6,7 @@ using UnityEngine.Experimental.UIElements;
 
 public class Hand_Ctrl : MonoBehaviour
 {
+    const float vyska_linek = -48.6f;
 
     public HUD_ctrl Select_HUD;
     public HUD_ctrl End_HUD;
@@ -328,8 +329,8 @@ public class Hand_Ctrl : MonoBehaviour
             {
                 target.master.Posledni = swap;
             }
+            target.Swap_Pos(swap);
         }
-        target.Swap_Pos(swap);
         Select_HUD.Adjust_HUD(target.gameObject);
     }
 
@@ -362,8 +363,8 @@ public class Hand_Ctrl : MonoBehaviour
             {
                 target.master.Prvni = swap;
             }
+            target.Swap_Pos(swap);
         }
-        target.Swap_Pos(swap);
         Select_HUD.Adjust_HUD(target.gameObject);
 
     }
@@ -502,6 +503,7 @@ public class Hand_Ctrl : MonoBehaviour
             hands[i] = new Holder();
             Add_line(hands[i]);
             Add_Nota((hands[i]));
+            hands[i].Prvni.gameObject.transform.position = proto_nota.transform.position;
         }
     }
 
@@ -514,10 +516,10 @@ public class Hand_Ctrl : MonoBehaviour
         klic.gameObject.name = "klic " + linek;
         klic.SetActive(true);
         GameObject end = Instantiate(proto_end, paper.transform, false);
-        end.gameObject.name = "klic " + linek;
+        end.gameObject.name = "end " + linek;
         end.SetActive(true);
+        novy.transform.position = novy.transform.position + new Vector3(0, linek * vyska_linek, 0);
         linek++;
-        novy.transform.up = novy.transform.up * linek;
         klic.transform.up = novy.transform.up;
         end.transform.up = novy.transform.up;
         Line_Ctrl target = hold.last;
