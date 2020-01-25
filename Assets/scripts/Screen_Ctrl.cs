@@ -27,7 +27,7 @@ public class Screen_Ctrl : MonoBehaviour
                 current.SetActive(true);
                 break;
             case 11:
-                new_menu.transform.SetParent(current.transform);
+                new_menu.transform.SetParent(current.transform, false);
                 new_menu.SetActive(true);
                 current.SetActive(true);
                 break;

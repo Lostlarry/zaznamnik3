@@ -1,12 +1,16 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class HUD_ctrl : MonoBehaviour
 {
     public Hand_Ctrl CTRL;
     public GameObject[] toggle_able;
     Vector3 default_pos;
+    public bool auth = false;
+    public GameObject[] auth_able;
 
     public bool select; 
 
@@ -18,29 +22,49 @@ public class HUD_ctrl : MonoBehaviour
             for (int i = 0; i < toggle_able.GetLength(0); i++)
             {
                 toggle_able[i].SetActive(toggle);
-            } 
+            }
+            for (int i = 0; i < auth_able.GetLength(0); i++)
+            {
+                auth_able[i].SetActive(auth);
+            }
         }
         else
         {
-            Znak tmp = target.GetComponent<Znak>();
-            int tmp_x = tmp.Pos_x;
-            int tmp_y = tmp.Pos_y;
-            tmp_x++;
-            if (tmp_x > Znak.notes_per_line)
+            Vector3 tmp = target.transform.position;
+            if(target.GetComponent<Znak>().Bump_pos())
             {
-                tmp_x = tmp_x - Znak.notes_per_line;
-                tmp_y++;
                 Send_Command(10);
             }
-            gameObject.transform.position = default_pos + new Vector3(tmp_x * Znak.nota_width, tmp_y * Hand_Ctrl.vyska_linek, 0);
+            gameObject.transform.position = target.transform.position;
+            target.transform.position = tmp;
         }
     }
+
+    public void set_auth(bool input)
+    {
+        auth = input;
+        for (int i = 0; i < auth_able.GetLength(0); i++)
+        {
+            auth_able[i].SetActive(auth);
+        }
+    }
+
 
     public void Send_Command(int cmd_id)
     {
         if (CTRL != null)
         {
             CTRL.Relay_signal(cmd_id);
+        }
+    }
+
+    public void Adjust_alpha(GameObject source)
+    {
+        Image[] list = GetComponentsInChildren<Image>();
+        for (int i = 0; i < list.GetLength(0); i++)
+        {
+            Color paint = list[i].color;
+            paint = new Color(paint.r, paint.g,paint.b, source.GetComponent<Slider>().value);
         }
     }
 
