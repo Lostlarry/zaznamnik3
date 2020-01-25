@@ -5,9 +5,8 @@ using UnityEngine;
 
 public class Znak : MonoBehaviour
 {
-    public const int notes_per_line = 30;
-    public const float nota_width = 4.4f;
-    public const float linka_height = 4.4f;
+    public const int notes_per_line = 16;
+    public const float nota_width = 26.4f;
     public const float nota_height = 4.4f;
 
     protected int delka = 1;
@@ -32,14 +31,14 @@ public class Znak : MonoBehaviour
 
     public virtual void Calc_Pos()
     {
-        gameObject.transform.position = gameObject.transform.position + new Vector3(pos_x * nota_width, -pos_y * linka_height, 0);
+        gameObject.transform.position = gameObject.transform.position + new Vector3(pos_x * nota_width, pos_y * Hand_Ctrl.vyska_linek, 0);
     }
 
     public virtual void Calc_Pos(int line_id, int nota_id)
     {
         pos_x = nota_id;
         pos_y = line_id;
-        gameObject.transform.position = gameObject.transform.position + new Vector3(pos_x * nota_width, -pos_y * linka_height, 0);
+        gameObject.transform.position = gameObject.transform.position + new Vector3(pos_x * nota_width, pos_y * Hand_Ctrl.vyska_linek, 0);
     }
 
     public void Swap_Pos(Znak target)
@@ -132,11 +131,10 @@ public class Znak : MonoBehaviour
     {
         pos_x = target.pos_x;
         pos_y = target.pos_y;
-        Calc_Pos();
     }
 
     public bool Bump_pos()
-    {
+    { 
         bool output = false;
         pos_x++;
         if (pos_x > notes_per_line)
@@ -161,14 +159,14 @@ public class Nota : Znak
 
     public override void Calc_Pos()
     {
-        gameObject.transform.position = gameObject.transform.position + new Vector3(pos_x * nota_width, - pos_y * linka_height + vyska * nota_height, 0);
+        gameObject.transform.position = gameObject.transform.position + new Vector3(pos_x * nota_width, pos_y * Hand_Ctrl.vyska_linek + vyska * nota_height, 0);
     }
 
     public override void Calc_Pos(int line_id, int nota_id)
     {
         pos_x = nota_id;
         pos_y = line_id;
-        gameObject.transform.position = gameObject.transform.position + new Vector3(pos_x * nota_width, -pos_y * linka_height + vyska * nota_height, 0);
+        gameObject.transform.position = gameObject.transform.position + new Vector3(pos_x * nota_width, pos_y * Hand_Ctrl.vyska_linek + vyska * nota_height, 0);
     }
 
     public override void Nota_Up(int i = 1)

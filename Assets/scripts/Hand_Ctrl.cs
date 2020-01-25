@@ -6,7 +6,7 @@ using UnityEngine.Experimental.UIElements;
 
 public class Hand_Ctrl : MonoBehaviour
 {
-    const float vyska_linek = -48.6f;
+    public const float vyska_linek = -48.6f;
 
     public HUD_ctrl Select_HUD;
     public HUD_ctrl End_HUD;
@@ -191,6 +191,7 @@ public class Hand_Ctrl : MonoBehaviour
         {
             made.master.Prvni = made;
             made.master.Posledni = made;
+            made.Calc_Pos();
         }
         hand.vybrany = made;
         Select_HUD.Adjust_HUD(GO);
@@ -519,9 +520,9 @@ public class Hand_Ctrl : MonoBehaviour
         end.gameObject.name = "end " + linek;
         end.SetActive(true);
         novy.transform.position = novy.transform.position + new Vector3(0, linek * vyska_linek, 0);
+        klic.transform.position = klic.transform.position + new Vector3(0, linek * vyska_linek, 0);
+        end.transform.position = end.transform.position + new Vector3(0, linek * vyska_linek, 0);
         linek++;
-        klic.transform.up = novy.transform.up;
-        end.transform.up = novy.transform.up;
         Line_Ctrl target = hold.last;
         Line_Ctrl LC = novy.GetComponent<Line_Ctrl>();
         LC.klic = klic;
@@ -569,8 +570,5 @@ public class Holder
     public Line_Ctrl last;
 
     public int klic = 1;//(1 = houslovy, 0 = bassovy)
-    public Holder()
-    {
-    }
 }
 

@@ -132,6 +132,7 @@ public class Screen_Ctrl : MonoBehaviour
     void Start()
     {
         current = mainmenu;
+        workplace.SetActive(false);
     }
     void Update(){}
 }

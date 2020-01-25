@@ -436,7 +436,7 @@ MonoBehaviour:
   toggle_able:
   - {fileID: 1733392665}
   - {fileID: 1316536473}
-  select: 0
+  select: 1
 --- !u!114 &26307340
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12769,7 +12769,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1947239743
 MonoBehaviour:
   m_ObjectHideFlags: 0
