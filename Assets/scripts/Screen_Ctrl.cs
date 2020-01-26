@@ -10,35 +10,36 @@ public class Screen_Ctrl : MonoBehaviour
     public GameObject playback;
 
     public GameObject new_menu;
+    public GameObject change_menu;
     public GameObject Errorlog;
     public Save_Load saver;
 
+    public Hand_Ctrl hand;
     GameObject current;
 
     public void Swap_canvas(int target)//target is number two digit number first declaring target canvas and second declaring other procedures before the swap
     {
-
         current.SetActive(false);
         Errorlog.SetActive(false);
         switch (target)
         {
-            case 1:
+            case 1://swap to workplace
                 current = workplace;
                 current.SetActive(true);
                 break;
-            case 11:
+            case 11://launch new file menu
                 new_menu.transform.SetParent(current.transform, false);
                 new_menu.SetActive(true);
                 current.SetActive(true);
                 break;
-            case 12:
+            case 12://output of new file menu   resets the workplace and loads new data 
                 int[] data = new_menu.GetComponent<New_Ctrl>().Getdata();
                 gameObject.GetComponent<Hand_Ctrl>().Reset(data);
                 current = workplace;
                 new_menu.SetActive(false);
                 current.SetActive(true);
                 break;
-            case 13:
+            case 13://loading from file
                 Hand_Ctrl original = gameObject.GetComponent<Hand_Ctrl>();
                 Hand_Ctrl temp = new Hand_Ctrl(saver.getString(), out bool[] errors);
                 errors = Log_Error(errors);
@@ -55,12 +56,17 @@ public class Screen_Ctrl : MonoBehaviour
                 }
                 current.SetActive(true);
                 break;
-            case 2:
+            case 2:// returning to main menu
                 current = mainmenu;
                 current.SetActive(true);
                 break;
-            case 3:
+            case 3://not in use
                 current = playback;
+                current.SetActive(true);
+                break;
+            case 4://change menu
+                change_menu.GetComponent<Change_ctrl>().Set_data(hand.get_selected());
+                change_menu.SetActive(true);
                 current.SetActive(true);
                 break;
             default:

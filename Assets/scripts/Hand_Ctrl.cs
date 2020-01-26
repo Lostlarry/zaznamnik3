@@ -283,7 +283,7 @@ public class Hand_Ctrl : MonoBehaviour
             case 6:
                 Shift_prev();
                 break;
-            case 7:
+            case 7://not in use
                 Change();
                 break;
             case 8:
@@ -555,7 +555,11 @@ public class Hand_Ctrl : MonoBehaviour
         {
             Add_line(target.master);
         }
+    }
 
+    public Znak get_selected()
+    {
+        return hands[selected_hand].vybrany;
     }
 }
 
