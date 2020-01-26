@@ -147,15 +147,22 @@ public class Znak : MonoBehaviour
         return output;
     }
 
+    public virtual int[] Copy()
+    {
+        return new int[2] {0, delka};
+    }
+
     void Start() { }
     void Update() { }
 }
+
 public class Nota : Znak
 {
     int vyska = 0; // relativne ku spodni radce
 
     int prefix = 0;// 0= nic 1 = krizky 2 = becka 3 = cista 
     int postfix = 0;// 0 = nic 1 az 3 tecky(prida pulku delky)
+    int topfix = 0;// 0 = nic 1 
 
     public override void Calc_Pos()
     {
@@ -241,6 +248,10 @@ public class Nota : Znak
         }
         return error;
     }
+    public override int[] Copy()
+    {
+        return new int[6] {2, delka, postfix, prefix, topfix, vyska};
+    }
 }
 
 class Pomlka : Znak
@@ -296,5 +307,9 @@ class Pomlka : Znak
             Debug.Log("attepted to destring non Pomlka string");
         }
         return error;
+    }
+    public override int[] Copy()
+    {
+        return new int[3] {1, delka, postfix};
     }
 }
