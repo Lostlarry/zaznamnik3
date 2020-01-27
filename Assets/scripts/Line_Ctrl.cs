@@ -9,15 +9,10 @@ public class Line_Ctrl : MonoBehaviour
 
     public GameObject klic;
     public GameObject end;
+    public GameObject pred;
 
     public Line_Ctrl Next { get => next; set => next = value; }
     public Line_Ctrl Prev { get => prev; set => prev = value; }
-
-    public void Prepare_Destroy()
-    {
-        Destroy(klic);
-        Destroy(end);
-    }
 
     void Start() { }
     void Update() { }

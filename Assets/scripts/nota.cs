@@ -7,7 +7,7 @@ public class Znak : MonoBehaviour
 {
     public const int notes_per_line = 16;
     public const float nota_width = 26.4f;
-    public const float nota_height = 4.4f;
+    public const float nota_height = 3.7f;
 
     protected int delka = 1;
 
@@ -31,13 +31,6 @@ public class Znak : MonoBehaviour
 
     public virtual void Calc_Pos()
     {
-        gameObject.transform.position = gameObject.transform.position + new Vector3(pos_x * nota_width, pos_y * Hand_Ctrl.vyska_linek, 0);
-    }
-
-    public virtual void Calc_Pos(int line_id, int nota_id)
-    {
-        pos_x = nota_id;
-        pos_y = line_id;
         gameObject.transform.position = gameObject.transform.position + new Vector3(pos_x * nota_width, pos_y * Hand_Ctrl.vyska_linek, 0);
     }
 
@@ -169,21 +162,16 @@ public class Nota : Znak
         gameObject.transform.position = gameObject.transform.position + new Vector3(pos_x * nota_width, pos_y * Hand_Ctrl.vyska_linek + vyska * nota_height, 0);
     }
 
-    public override void Calc_Pos(int line_id, int nota_id)
-    {
-        pos_x = nota_id;
-        pos_y = line_id;
-        gameObject.transform.position = gameObject.transform.position + new Vector3(pos_x * nota_width, pos_y * Hand_Ctrl.vyska_linek + vyska * nota_height, 0);
-    }
-
     public override void Nota_Up(int i = 1)
     {
         vyska = i + vyska;
+        Calc_Pos();
     }
 
     public override void Nota_Down(int i = 1)
     {
         vyska = i - vyska;
+        Calc_Pos();
     }
 
     public override string ToString()
@@ -313,3 +301,85 @@ class Pomlka : Znak
         return new int[3] {1, delka, postfix};
     }
 }
+
+class Acord : Znak
+{
+    Nota start;
+
+    int vyska = 0; // relativne ku spodni radce relativne k prvni note
+    
+    int topfix = 0;// 0 = nic 1 
+
+    public override void Calc_Pos()
+    {
+        gameObject.transform.position = gameObject.transform.position + new Vector3(pos_x * nota_width, pos_y * Hand_Ctrl.vyska_linek + vyska * nota_height, 0);
+    }
+
+    public override void Nota_Up(int i = 1)
+    {
+        vyska = i + vyska;
+        Calc_Pos();
+    }
+
+    public override void Nota_Down(int i = 1)
+    {
+        vyska = i - vyska;
+        Calc_Pos();
+    }
+
+    public override string ToString()
+    {
+        string output = "";
+        Nota selected = start;
+        while (selected != null)
+        {
+            output = output + selected.ToString();
+        }
+        return "A," + delka + "," + vyska + "," + output + ";";
+    }
+
+    public override bool is_nota()
+    {
+        return true;//maybe
+    }
+
+    public override bool FromString(string input)
+    {
+        bool error = false;
+        char[] filter = new char[1];
+        filter[0] = ',';
+        string[] data = input.Split(filter, StringSplitOptions.RemoveEmptyEntries);
+        if (data[0] == "A")
+        {
+            Int32 output = new Int32();
+            if (int.TryParse(data[1], out output))
+            {
+                delka = output;
+            }
+            else
+            {
+                error = true;
+            }
+
+            if (int.TryParse(data[2], out output))
+            {
+                vyska = output;
+            }
+            else
+            {
+                error = true;
+            }
+        }
+        else
+        {
+            error = true;
+            Debug.Log("attepted to destring non Acord string");
+        }
+        return error;
+    }
+    public override int[] Copy()
+    {
+        return new int[4] { 3, delka, topfix, vyska };
+    }
+}
+

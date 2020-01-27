@@ -15,6 +15,8 @@ public class Hand_Ctrl : MonoBehaviour
     public GameObject proto_linka;
     public GameObject proto_klic;
     public GameObject proto_end;
+    public GameObject proto_pred_h;
+    public GameObject proto_pred_b;
 
     Holder[] hands;
 
@@ -23,7 +25,7 @@ public class Hand_Ctrl : MonoBehaviour
     int not = 0;
     int linek = 0;
 
-    public int tonina = 0; //(0 = cdur)
+    public int predznamenani = 0; //0 = cdur kladny jsou krizky, zaporny jsou becka
     public int takt = 1;
 
     public override string ToString()
@@ -40,7 +42,7 @@ public class Hand_Ctrl : MonoBehaviour
             dat = "H," + hands[i].klic + ";" + dat; 
         }
 
-        dat = hands.GetLength(0)+ "," + tonina + "," + takt + ";" + dat;
+        dat = hands.GetLength(0)+ "," + predznamenani + "," + takt + ";" + dat;
 
         return dat;
     }
@@ -64,7 +66,7 @@ public class Hand_Ctrl : MonoBehaviour
 
                 if (int.TryParse(localdata[1], out output))
                 {
-                    tonina = output;
+                    predznamenani = output;
                 }
                 else
                 {
@@ -122,6 +124,15 @@ public class Hand_Ctrl : MonoBehaviour
                                 break;
                             }
                             errors[6] = (Add_Pomlka(hands[index]).FromString(data[i]) || errors[6]);
+                            break;
+
+                        case "A":
+                            if (index == -1)
+                            {
+                                errors[4] = true;
+                                break;
+                            }
+                            //errors[6] = (Add_Pomlka(hands[index]).FromString(data[i]) || errors[6]);
                             break;
 
                         default:
@@ -430,7 +441,7 @@ public class Hand_Ctrl : MonoBehaviour
         Select_hand(0);
         not = 0;
         linek = 0;
-        tonina = 0;
+        predznamenani = 0;
         takt = 1;
 
         if (hands != null)
@@ -497,7 +508,7 @@ public class Hand_Ctrl : MonoBehaviour
     public void Create(int[] data)
     {
         hands = new Holder[data[0]];
-        tonina = data[1];
+        predznamenani = data[1];
         takt = data[2];
         for (int i = 0; i < data[0]; i++)
         {
@@ -519,14 +530,28 @@ public class Hand_Ctrl : MonoBehaviour
         GameObject end = Instantiate(proto_end, paper.transform, false);
         end.gameObject.name = "end " + linek;
         end.SetActive(true);
+        GameObject pred;
+        if (hold.klic == 1)
+        {
+            pred = Instantiate(proto_pred_h, paper.transform, false);
+        }
+        else
+        {
+            pred = Instantiate(proto_pred_b, paper.transform, false);
+        }
+        pred.GetComponent<Predznamenani>().Activate(predznamenani);
+        pred.gameObject.name = "pred " + linek;
+        pred.SetActive(true);
         novy.transform.position = novy.transform.position + new Vector3(0, linek * vyska_linek, 0);
         klic.transform.position = klic.transform.position + new Vector3(0, linek * vyska_linek, 0);
         end.transform.position = end.transform.position + new Vector3(0, linek * vyska_linek, 0);
+        pred.transform.position = pred.transform.position + new Vector3(0, linek * vyska_linek, 0);
         linek++;
         Line_Ctrl target = hold.last;
         Line_Ctrl LC = novy.GetComponent<Line_Ctrl>();
         LC.klic = klic;
         LC.end = end;
+        LC.pred = pred;
         if (target != null)
         {
             target.Next = LC;
