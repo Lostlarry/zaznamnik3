@@ -57,6 +57,7 @@ public class Nota_ProtoType : MonoBehaviour
         set
         {
             vyska = value;
+            master.Control_prefix();
             Update_gfx();
         }
     }

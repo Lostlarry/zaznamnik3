@@ -7,6 +7,7 @@ public class Change_ctrl : MonoBehaviour
 {
     public Hand_Ctrl CTRL;
 
+    public Button[] vyska_buttons;
     public InputField Vyska_txt;
     public InputField Delka_txt;
 
@@ -44,20 +45,19 @@ public class Change_ctrl : MonoBehaviour
         prototype.Delka = int.Parse(Target_delka);
     }
 
-    public void Input_state(int index)
+    public void Input_state(bool is_nota)
     {
         if (!swaping)
         {
-            swaping = true;
-            if (index == 0)
+            swaping = true;// we are modifing isOn value of the toggles which will triger this fucntion
+            nota.isOn = is_nota;
+            pomlka.isOn = !is_nota;
+            prototype.Nota = is_nota;
+            for (int i = 0; i < vyska_buttons.GetLength(0); i++)
             {
-                nota.isOn = !nota.isOn;
+                vyska_buttons[i].enabled = is_nota;
+                Vyska_txt.enabled = is_nota;
             }
-            else
-            {
-                pomlka.isOn = !pomlka.isOn;
-            }
-            prototype.Nota = !prototype.Nota;
             swaping = false;
         }
     }
@@ -68,20 +68,14 @@ public class Change_ctrl : MonoBehaviour
         {
             swaping = true;
             bool state = prefix[index].isOn;
-            for (int i = 0; i < prefix.GetLength(0); i++)
-            {
-                if (i != index)
-                {
-                    prefix[i].isOn = false;
-                }
-            }
             if (state)
             {
-                prototype.Prefix = 0;
+                prototype.Prefix = index + 1;
+                prefix[prototype.Prefix].isOn = false;
             }
             else
             {
-                prototype.Prefix = index + 1;
+                prototype.Prefix = 0;
             }
             swaping = false;
         }
@@ -105,10 +99,31 @@ public class Change_ctrl : MonoBehaviour
         }
     }
 
+    public void Control_prefix()
+    {
+        int result = pred.Is_moded(prototype.Vyska);
+        if (result == 1)
+        {
+            prefix[1].enabled = false;//krizek blokuje becko
+            prefix[1].isOn = false;
+        }
+        else if (result == 2)
+        {
+            prefix[0].enabled = false;//becko blokuje krizek
+            prefix[0].isOn = false;
+        }
+        else
+        {
+            prefix[2].enabled = false;//zadny predznamanani blokuje odrazku
+            prefix[2].isOn = false;
+        }
+    }
+
+
     // Start is called before the first frame update
     void Start()
     {
-        //gameObject.SetActive(false);
+
     }
 
     // Update is called once per frame

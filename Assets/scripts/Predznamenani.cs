@@ -7,8 +7,11 @@ public class Predznamenani : MonoBehaviour
     public GameObject[] Krizky;
     public GameObject[] Becka;
 
+    int odchylka = 0;
+
     public void Activate(int amount)
     {
+        odchylka = amount;
         if (amount > 0)
         {
             for (int i = 0; i + 1 < amount; i++)
@@ -48,6 +51,20 @@ public class Predznamenani : MonoBehaviour
         }
     }
 
+    public int Is_moded(int vyska)
+    {
+        int mod_vyska = make_positive(vyska) % 7;
+        if (odchylka > (mod_vyska + 1) * 2 / 7)
+        {
+            return 1;//krizek
+        }
+        else if(odchylka < (2 - mod_vyska) * 2 / 7)
+        {
+            return 2;//pomlka
+        }
+        return 0;//nothing
+    }
+
 
     // Start is called before the first frame update
     void Start()
@@ -59,5 +76,14 @@ public class Predznamenani : MonoBehaviour
     void Update()
     {
         
+    }
+
+    int make_positive(int i)
+    {
+        while (i < 0)
+        {
+            i = i + 7;
+        }
+        return i;
     }
 }
