@@ -11,26 +11,31 @@ public class Save_Load : MonoBehaviour
 
     string input = "";
 
-    public void Save()
+    public bool Save()
     {
         string savefile = strEx("Save File", "nml", "/saves");
-        if (savefile != null)
+        if (savefile != "")
         {
             string output = gameObject.GetComponent<Hand_Ctrl>().ToString();
             TextWriter writer = new StreamWriter(savefile, false);
             writer.WriteLine(output);
             writer.Close();
+            return true;
         }
+        return false;
     }
-    public void Load()
+    public bool Load()
     {
         string savefile = strEx("Load File", "nml", "/saves");
-        if (savefile != null)
+        if ( savefile != "")
         {
+            Debug.Log("\""+savefile+"\"");
             TextReader reader = new StreamReader(savefile);
             input = reader.ReadLine();
             reader.Close();
+            return true;
         }
+        return false;
     }
 
     string strEx(string name, string ext, string add = "")

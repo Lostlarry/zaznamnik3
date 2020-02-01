@@ -5,11 +5,14 @@ using UnityEngine;
 
 public class Znak : MonoBehaviour
 {
+    public static Grafix_bank Gfx_src;
+    public static Hand_Ctrl CTRL;
+
     public const int notes_per_line = 16;
     public const float nota_width = 26.4f;
     public const float nota_height = 3.7f;
 
-    protected int delka = 1;
+    protected int delka = 0; // exponent 2 vzdy zaporne (2 na -2 je 1/4, atd.)
 
     public Holder master;
 
@@ -29,8 +32,13 @@ public class Znak : MonoBehaviour
         delka = Z.delka;
     }
 
-    public virtual void Calc_Pos()
+    public virtual void Calc_Pos(bool update = false)
     {
+        if (update)
+        {
+            Transfer_pos(prev);
+            Bump_pos();
+        }
         gameObject.transform.position = gameObject.transform.position + new Vector3(pos_x * nota_width, pos_y * Hand_Ctrl.vyska_linek, 0);
     }
 
@@ -65,11 +73,17 @@ public class Znak : MonoBehaviour
     public virtual void Nota_Long(int i = 1)
     {
         delka = delka + 1;
+        if (delka > 0)
+        {
+
+        }
+        Update_gfx();
     }
 
     public virtual void Nota_Short(int i = 1)
     {
         delka = delka - 1;
+        Update_gfx();
     }
 
     public override string ToString()
@@ -103,6 +117,11 @@ public class Znak : MonoBehaviour
         return error;
     }
 
+    protected virtual void Do_lig()
+    {
+        delka = 0;
+    }
+
     public void Transfer(Znak target)
     {
         Prev = target.Prev;
@@ -129,7 +148,7 @@ public class Znak : MonoBehaviour
     public bool Bump_pos()
     { 
         bool output = false;
-        pos_x++;
+        pos_x = pos_x + 2^prev.delka;
         if (pos_x > notes_per_line)
         {
             pos_x = pos_x - notes_per_line;
@@ -144,6 +163,11 @@ public class Znak : MonoBehaviour
     {
         return new int[2] {0, delka};
     }
+    
+    protected virtual void Update_gfx()
+    {
+        
+    }
 
     void Start() { }
     void Update() { }
@@ -151,14 +175,20 @@ public class Znak : MonoBehaviour
 
 public class Nota : Znak
 {
+
     int vyska = 0; // relativne ku spodni radce
 
     int prefix = 0;// 0= nic 1 = krizky 2 = becka 3 = cista 
     int postfix = 0;// 0 = nic 1 az 3 tecky(prida pulku delky)
     int topfix = 0;// 0 = nic 1 
 
-    public override void Calc_Pos()
+    public override void Calc_Pos(bool update = false)
     {
+        if (update)
+        {
+            Transfer_pos(prev);
+            Bump_pos();
+        }
         gameObject.transform.position = gameObject.transform.position + new Vector3(pos_x * nota_width, pos_y * Hand_Ctrl.vyska_linek + vyska * nota_height, 0);
     }
 
@@ -240,17 +270,17 @@ public class Nota : Znak
     {
         return new int[6] {2, delka, postfix, prefix, topfix, vyska};
     }
+
+    protected override void Update_gfx()
+    {
+        base.Update_gfx();
+    }
 }
 
 class Pomlka : Znak
 {
 
     int postfix = 0;// 0 = nic 1 az 3 tecky(prida pulku delky)
-
-    public Pomlka(int delka = 1)
-    {
-        this.delka = delka;
-    }
 
     public override string ToString()
     {
@@ -296,9 +326,15 @@ class Pomlka : Znak
         }
         return error;
     }
+
     public override int[] Copy()
     {
         return new int[3] {1, delka, postfix};
+    }
+
+    protected override void Do_lig()
+    {
+
     }
 }
 
@@ -309,11 +345,6 @@ class Acord : Znak
     int vyska = 0; // relativne ku spodni radce relativne k prvni note
     
     int topfix = 0;// 0 = nic 1 
-
-    public override void Calc_Pos()
-    {
-        gameObject.transform.position = gameObject.transform.position + new Vector3(pos_x * nota_width, pos_y * Hand_Ctrl.vyska_linek + vyska * nota_height, 0);
-    }
 
     public override void Nota_Up(int i = 1)
     {

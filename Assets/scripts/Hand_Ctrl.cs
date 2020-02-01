@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Experimental.UIElements;
 
 public class Hand_Ctrl : MonoBehaviour
 {
@@ -47,7 +44,7 @@ public class Hand_Ctrl : MonoBehaviour
         return dat;
     }
 
-    public Hand_Ctrl(string input, out bool[] errors)
+    public Hand_Ctrl Give_data(string input, out bool[] errors)
     {
         //hands count not loaded * hands count invalid * no hands loaded * invalid string * N/P when no hand tag * invalid datatype * subtype destring error * more hands then hand count * less hands then hand count
         errors = new bool[9] {false, false, false, false, false, false, false, false, false};
@@ -165,6 +162,7 @@ public class Hand_Ctrl : MonoBehaviour
         {
             errors[0] = true;
         }
+        return this;
     }
 
     Nota Add_Nota(Holder hand, Znak target = null)
@@ -205,8 +203,8 @@ public class Hand_Ctrl : MonoBehaviour
             made.Calc_Pos();
         }
         hand.vybrany = made;
-        Select_HUD.Adjust_HUD(GO);
-        End_HUD.Adjust_HUD(GO);
+        Select_HUD.Adjust_HUD(made);
+        End_HUD.Adjust_HUD(hand.Posledni);
         return made;
     }
 
@@ -235,7 +233,8 @@ public class Hand_Ctrl : MonoBehaviour
             made.Prev = target;
         }
         hand.vybrany = made;
-        Select_HUD.Adjust_HUD(GO, false);
+        Select_HUD.Adjust_HUD(made);
+        End_HUD.Adjust_HUD(hand.Posledni);
         return made;
     }
 
@@ -284,9 +283,11 @@ public class Hand_Ctrl : MonoBehaviour
                 break;
             case 3:
                 hands[selected_hand].vybrany.Nota_Long();
+                Recalc(hands[selected_hand].vybrany);
                 break;
             case 4:
                 hands[selected_hand].vybrany.Nota_Short();
+                Recalc(hands[selected_hand].vybrany);
                 break;
             case 5:
                 Shift_next();
@@ -343,7 +344,7 @@ public class Hand_Ctrl : MonoBehaviour
             }
             target.Swap_Pos(swap);
         }
-        Select_HUD.Adjust_HUD(target.gameObject);
+        Select_HUD.Adjust_HUD(target);
     }
 
     private void Shift_next(Znak target = null)
@@ -377,7 +378,7 @@ public class Hand_Ctrl : MonoBehaviour
             }
             target.Swap_Pos(swap);
         }
-        Select_HUD.Adjust_HUD(target.gameObject);
+        Select_HUD.Adjust_HUD(target);
 
     }
 
@@ -565,15 +566,17 @@ public class Hand_Ctrl : MonoBehaviour
         }
     }
 
-    void Start(){}
+    void Start()
+    {
+        Znak.CTRL = this;
+    }
     void Update(){}
 
-    void Recalc(Znak target, bool force = false)
+    public void Recalc(Znak target, bool force = false)
     {
         while (target.Next != null)
         {
-            target.Transfer_pos(target.Next);
-            target.Calc_Pos();
+            target.Calc_Pos(true);
             target = target.Next;
         }
         if (target.Bump_pos())

@@ -31,8 +31,10 @@ public class Menu : MonoBehaviour
 
     public void Load()
     {
-        S_L.Load();
-        Ctrl.Swap_canvas(13);
+        if (S_L.Load())
+        {
+            Ctrl.Swap_canvas(13); 
+        }
     }
 
     public void Save()

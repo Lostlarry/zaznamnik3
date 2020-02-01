@@ -6,19 +6,25 @@ using UnityEngine.UI;
 
 public class HUD_ctrl : MonoBehaviour
 {
+    const float modx = -180f;
+    const float mody = 233f;
+
+
     public Hand_Ctrl CTRL;
     public GameObject[] toggle_able;
-    Vector3 default_pos;
     public bool auth = false;
     public GameObject[] auth_able;
 
     public bool select; 
 
-    public virtual void Adjust_HUD(GameObject target, bool toggle = true)
+    public virtual void Adjust_HUD(Znak target, bool toggle = true)
     {
+        Vector3 master_scale = gameObject.transform.parent.position;
+        Vector3 ref_point = new Vector3(master_scale.x + modx, master_scale.y + mody);
+        Debug.Log( gameObject.transform.parent.gameObject.name +" " +master_scale + " " + ref_point);
         if (select)
         {
-            gameObject.transform.position = target.transform.position;
+            gameObject.transform.position = ref_point + new Vector3(target.Pos_x * Znak.nota_width, target.Pos_y * Hand_Ctrl.vyska_linek, 0);
             for (int i = 0; i < toggle_able.GetLength(0); i++)
             {
                 toggle_able[i].SetActive(toggle);
@@ -30,13 +36,15 @@ public class HUD_ctrl : MonoBehaviour
         }
         else
         {
-            Vector3 tmp = target.transform.position;
-            if(target.GetComponent<Znak>().Bump_pos())
+            int posy = target.Pos_y;
+            int posx = target.Pos_x + 1;
+            if(posx > Znak.notes_per_line)
             {
                 Send_Command(10);
+                posy++;
+                posx = posx - Znak.notes_per_line;
             }
-            gameObject.transform.position = target.transform.position;
-            target.transform.position = tmp;
+            gameObject.transform.position = ref_point + new Vector3(posx * Znak.nota_width, posy * Hand_Ctrl.vyska_linek, 0);
         }
     }
 
@@ -67,16 +75,10 @@ public class HUD_ctrl : MonoBehaviour
             paint = new Color(paint.r, paint.g,paint.b, source.GetComponent<Slider>().value);
         }
     }
-
-    public Vector3 Get_Pos()
-    {
-        return gameObject.transform.position;
-    }
     
     // Start is called before the first frame update
     void Start()
     {
-        default_pos = gameObject.transform.position;
     }
 
     // Update is called once per frame
