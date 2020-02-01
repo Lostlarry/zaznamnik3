@@ -17,17 +17,16 @@ public class HUD_ctrl : MonoBehaviour
 
     public bool select; 
 
-    public virtual void Adjust_HUD(Znak target, bool toggle = true)
+    public virtual void Adjust_HUD(Znak target)
     {
         Vector3 master_scale = gameObject.transform.parent.position;
         Vector3 ref_point = new Vector3(master_scale.x + modx, master_scale.y + mody);
-        Debug.Log( gameObject.transform.parent.gameObject.name +" " +master_scale + " " + ref_point);
         if (select)
         {
-            gameObject.transform.position = ref_point + new Vector3(target.Pos_x * Znak.nota_width, target.Pos_y * Hand_Ctrl.vyska_linek, 0);
+            gameObject.transform.position = ref_point + new Vector3(target.Pos_x * Znak.takt_width, target.Pos_y * Hand_Ctrl.vyska_linek, 0);
             for (int i = 0; i < toggle_able.GetLength(0); i++)
             {
-                toggle_able[i].SetActive(toggle);
+                toggle_able[i].SetActive(target.is_nota());
             }
             for (int i = 0; i < auth_able.GetLength(0); i++)
             {
@@ -44,7 +43,7 @@ public class HUD_ctrl : MonoBehaviour
                 posy++;
                 posx = posx - Znak.notes_per_line;
             }
-            gameObject.transform.position = ref_point + new Vector3(posx * Znak.nota_width, posy * Hand_Ctrl.vyska_linek, 0);
+            gameObject.transform.position = ref_point + new Vector3(posx * Znak.takt_width, posy * Hand_Ctrl.vyska_linek, 0);
         }
     }
 

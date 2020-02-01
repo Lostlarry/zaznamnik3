@@ -9,7 +9,7 @@ public class Znak : MonoBehaviour
     public static Hand_Ctrl CTRL;
 
     public const int notes_per_line = 16;
-    public const float nota_width = 26.4f;
+    public const float takt_width = 26.4f;
     public const float nota_height = 3.7f;
 
     protected int delka = 0; // exponent 2 vzdy zaporne (2 na -2 je 1/4, atd.)
@@ -39,7 +39,7 @@ public class Znak : MonoBehaviour
             Transfer_pos(prev);
             Bump_pos();
         }
-        gameObject.transform.position = gameObject.transform.position + new Vector3(pos_x * nota_width, pos_y * Hand_Ctrl.vyska_linek, 0);
+        gameObject.transform.position = gameObject.transform.position + new Vector3(pos_x * takt_width, pos_y * Hand_Ctrl.vyska_linek, 0);
     }
 
     public void Swap_Pos(Znak target)
@@ -82,8 +82,11 @@ public class Znak : MonoBehaviour
 
     public virtual void Nota_Short(int i = 1)
     {
-        delka = delka - 1;
-        Update_gfx();
+        if (i > -4)// mensi nez sestnanctiny neberem
+        {
+            delka = delka - 1;
+            Update_gfx(); 
+        }
     }
 
     public override string ToString()
@@ -189,7 +192,7 @@ public class Nota : Znak
             Transfer_pos(prev);
             Bump_pos();
         }
-        gameObject.transform.position = gameObject.transform.position + new Vector3(pos_x * nota_width, pos_y * Hand_Ctrl.vyska_linek + vyska * nota_height, 0);
+        gameObject.transform.position = gameObject.transform.position + new Vector3(pos_x * takt_width, pos_y * Hand_Ctrl.vyska_linek + vyska * nota_height, 0);
     }
 
     public override void Nota_Up(int i = 1)

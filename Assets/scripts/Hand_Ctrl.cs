@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Hand_Ctrl : MonoBehaviour
@@ -256,19 +257,11 @@ public class Hand_Ctrl : MonoBehaviour
 
     public void Select_note(GameObject input)
     {
-        Znak selected = input.GetComponent<Znak>();
-        while (selected.Prev != null)
-        {
-            selected = selected.Prev;
-        }
-        for(int i = 0; i < hands.GetLength(0);i++)
-        {
-            if (selected == hands[i].Prvni)
-            {
-                hands[i].vybrany = input.GetComponent<Znak>();
-                Select_hand(i);
-            }
-        }
+        Znak select = input.GetComponent<Znak>();
+        select.master.vybrany = select;
+        Select_hand(select.master);
+        Select_HUD.Adjust_HUD(select);
+
     }
 
     public void Relay_signal(int cmd_id)

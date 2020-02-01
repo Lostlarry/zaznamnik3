@@ -60,7 +60,7 @@
      <Compile Include="Assets\scripts\Line_Ctrl.cs" />
      <Compile Include="Assets\scripts\Menu.cs" />
      <Compile Include="Assets\scripts\New_Ctrl.cs" />
-     <Compile Include="Assets\scripts\nota.cs" />
+     <Compile Include="Assets\scripts\Nota.cs" />
      <Compile Include="Assets\scripts\Nota_ProtoType.cs" />
      <Compile Include="Assets\scripts\playback.cs" />
      <Compile Include="Assets\scripts\Predznamenani.cs" />
