@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Znak : MonoBehaviour
 {
@@ -19,13 +20,14 @@ public class Znak : MonoBehaviour
     protected Znak prev;
     protected Znak next;
 
-    protected int pos_x = 0;
+    protected float pos_x = 0;
     protected int pos_y = 0;
 
     public Znak Prev { get => prev; set => prev = value; }
     public Znak Next { get => next; set => next = value; }
-    public int Pos_x { get => pos_x; set => pos_x = value; }
+    public float Pos_x { get => pos_x; set => pos_x = value; }
     public int Pos_y { get => pos_y; set => pos_y = value; }
+    public virtual int Postfix { get { return 0; } set { } }
 
     public void Load(Znak Z)
     {
@@ -39,12 +41,12 @@ public class Znak : MonoBehaviour
             Transfer_pos(prev);
             Bump_pos();
         }
-        gameObject.transform.position = gameObject.transform.position + new Vector3(pos_x * takt_width, pos_y * Hand_Ctrl.vyska_linek, 0);
+        gameObject.transform.position = gameObject.transform.position + new Vector3((pos_x * takt_width), pos_y * Hand_Ctrl.vyska_linek, 0);
     }
 
     public void Swap_Pos(Znak target)
     {
-        int tmp_x = target.pos_x;
+        float tmp_x = target.pos_x;
         int tmp_y = target.pos_y;
         target.pos_x = pos_x;
         target.pos_y = pos_y;
@@ -151,7 +153,9 @@ public class Znak : MonoBehaviour
     public bool Bump_pos()
     { 
         bool output = false;
-        pos_x = pos_x + 2^prev.delka;
+        float mod = 2^prev.delka;
+        mod = mod + 0.5f * prev.Postfix;
+        pos_x = pos_x + mod;
         if (pos_x > notes_per_line)
         {
             pos_x = pos_x - notes_per_line;
@@ -184,6 +188,10 @@ public class Nota : Znak
     int prefix = 0;// 0= nic 1 = krizky 2 = becka 3 = cista 
     int postfix = 0;// 0 = nic 1 az 3 tecky(prida pulku delky)
     int topfix = 0;// 0 = nic 1 
+
+    public GameObject prapor;
+
+    public override int Postfix { get => postfix; set => postfix = value; }
 
     public override void Calc_Pos(bool update = false)
     {
@@ -276,6 +284,22 @@ public class Nota : Znak
 
     protected override void Update_gfx()
     {
+        if (delka < -1)
+        {
+            gameObject.GetComponent<Image>().sprite = Gfx_src.Nota_ctvrt;
+            for (int i = -1; i < delka; i++)
+            {
+
+            }
+        }
+        else if (delka == -1)
+        {
+            gameObject.GetComponent<Image>().sprite = Gfx_src.Nota_pull;
+        }
+        else
+        {
+            gameObject.GetComponent<Image>().sprite = Gfx_src.Nota_cela;
+        }
         base.Update_gfx();
     }
 }

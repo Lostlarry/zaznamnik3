@@ -9,7 +9,6 @@ public class HUD_ctrl : MonoBehaviour
     const float modx = -180f;
     const float mody = 233f;
 
-
     public Hand_Ctrl CTRL;
     public GameObject[] toggle_able;
     public bool auth = false;
@@ -36,7 +35,7 @@ public class HUD_ctrl : MonoBehaviour
         else
         {
             int posy = target.Pos_y;
-            int posx = target.Pos_x + 1;
+            float posx = target.Pos_x + 1;
             if(posx > Znak.notes_per_line)
             {
                 Send_Command(10);

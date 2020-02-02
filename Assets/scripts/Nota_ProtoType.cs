@@ -11,6 +11,8 @@ public class Nota_ProtoType : MonoBehaviour
     public GameObject topfix_GO;
     public GameObject postfix_GO;
 
+    public GameObject[] prapor_GOs;
+
     public Grafix_bank Gfx;
 
     bool nota = true;
@@ -128,6 +130,7 @@ public class Nota_ProtoType : MonoBehaviour
 
     public void Update_gfx()
     {
+        // vyska a prevraceni
         gameObject.transform.position = default_pos + new Vector3(0, vyska * Znak.nota_height);
         if (vyska > 1)
         {
@@ -141,7 +144,12 @@ public class Nota_ProtoType : MonoBehaviour
             prefix_GO.transform.position = new Vector3(abs(prefix_GO.transform.position.x), prefix_GO.transform.position.y, prefix_GO.transform.position.z);
             prefix_GO.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
         }
-        
+        //pomocne carky
+        if(vyska < -3)
+        {
+
+        }
+        // prefix becka krizky
         switch (prefix)
         {
             case 1:
@@ -160,6 +168,45 @@ public class Nota_ProtoType : MonoBehaviour
                 prefix_GO.SetActive(false);
                 break;
         }
+        //delka not
+        if (delka < -1)
+        {
+            gameObject.GetComponent<Image>().sprite = Gfx.Nota_ctvrt;
+            for (int i = -2; i < delka; i--)
+            {
+                prapor_GOs[abs(i) - 2].SetActive(true);
+            }
+        }
+        else if (delka == -1)
+        {
+            gameObject.GetComponent<Image>().sprite = Gfx.Nota_pull;
+        }
+        else
+        {
+            gameObject.GetComponent<Image>().sprite = Gfx.Nota_cela;
+        }
+        for (int i = delka; abs(i) - 2 < prapor_GOs.GetLength(0); i--)
+        {
+            prapor_GOs[abs(i) - 2].SetActive(false);
+        }
+        //postfix
+        if (postfix != 0)
+        {
+            postfix_GO.SetActive(true);
+        }
+        else
+        {
+            postfix_GO.SetActive(false);
+        }
+        //topfix
+        if (topfix != 0)
+        {
+            topfix_GO.SetActive(true);
+        }
+        else
+        {
+            topfix_GO.SetActive(false);
+        }
     }
 
     // Start is called before the first frame update
@@ -175,6 +222,18 @@ public class Nota_ProtoType : MonoBehaviour
     }
 
     float abs(float input)
+    {
+        if (input < 0)
+        {
+            return -input;
+        }
+        else
+        {
+            return input;
+        }
+    }
+
+    int abs(int input)
     {
         if (input < 0)
         {
