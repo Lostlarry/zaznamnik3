@@ -54,11 +54,11 @@ public class Predznamenani : MonoBehaviour
     public int Is_moded(int vyska)
     {
         int mod_vyska = make_positive(vyska) % 7;
-        if (odchylka > (mod_vyska + 1) * 2 / 7)
+        if (odchylka > (mod_vyska + 1) * 2 % 7)
         {
             return 1;//krizek
         }
-        else if(odchylka < (2 - mod_vyska) * 2 / 7)
+        else if(odchylka < (2 - mod_vyska) * 2 % 7)
         {
             return 2;//pomlka
         }

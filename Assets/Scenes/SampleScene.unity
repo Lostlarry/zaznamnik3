@@ -884,7 +884,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 189882944}
-        m_MethodName: Mod_vyska
+        m_MethodName: Mod_delka
         m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1088,9 +1088,9 @@ RectTransform:
   m_Father: {fileID: 375950492}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 1, y: 0.5}
-  m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: -77.4, y: 0}
+  m_AnchorMin: {x: 0, y: 0.5}
+  m_AnchorMax: {x: 0, y: 0.5}
+  m_AnchoredPosition: {x: 62.6, y: 0}
   m_SizeDelta: {x: 60, y: 48}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &109837055
@@ -1554,7 +1554,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &189882941
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1639,7 +1639,10 @@ MonoBehaviour:
   pred: {fileID: 109837055}
   pomlka: {fileID: 1137299573}
   nota: {fileID: 1240814863}
-  prefix: []
+  prefix:
+  - {fileID: 1426681198}
+  - {fileID: 1798053436}
+  - {fileID: 325843378}
   prototype: {fileID: 260863457}
 --- !u!1 &191655467
 GameObject:
@@ -2582,15 +2585,16 @@ RectTransform:
   - {fileID: 659363468}
   - {fileID: 1036884933}
   - {fileID: 901593924}
-  - {fileID: 1834274315}
   - {fileID: 2040184002}
   - {fileID: 1294678833}
+  - {fileID: 1783601990}
+  - {fileID: 1834274315}
   m_Father: {fileID: 375950492}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: -30.418457, y: -6.605072}
+  m_AnchoredPosition: {x: -30, y: -6.6}
   m_SizeDelta: {x: 24, y: 36}
   m_Pivot: {x: 0.4999994, y: 0.27994612}
 --- !u!114 &260863455
@@ -2646,6 +2650,8 @@ MonoBehaviour:
   prefix_GO: {fileID: 659363467}
   topfix_GO: {fileID: 901593923}
   postfix_GO: {fileID: 1036884932}
+  carka_licha: {fileID: 1783601989}
+  carka_suda: {fileID: 1834274314}
   prapor_GOs:
   - {fileID: 2040184001}
   - {fileID: 1294678832}
@@ -3299,6 +3305,7 @@ GameObject:
   m_Component:
   - component: {fileID: 325843377}
   - component: {fileID: 325843378}
+  - component: {fileID: 325843379}
   m_Layer: 5
   m_Name: odrazka
   m_TagString: Untagged
@@ -3366,7 +3373,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 558107996}
   toggleTransition: 1
   graphic: {fileID: 2031291183}
-  m_Group: {fileID: 0}
+  m_Group: {fileID: 325843379}
   onValueChanged:
     m_PersistentCalls:
       m_Calls:
@@ -3376,7 +3383,7 @@ MonoBehaviour:
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 3
+          m_IntArgument: 2
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
@@ -3384,6 +3391,19 @@ MonoBehaviour:
     m_TypeName: UnityEngine.UI.Toggle+ToggleEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
   m_IsOn: 0
+--- !u!114 &325843379
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 325843376}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1184210157, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_AllowSwitchOff: 1
 --- !u!1 &338765673
 GameObject:
   m_ObjectHideFlags: 0
@@ -3827,10 +3847,10 @@ RectTransform:
   m_Father: {fileID: 189882941}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 85, y: -70}
-  m_SizeDelta: {x: 140, y: 70}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -115, y: 80}
+  m_SizeDelta: {x: 140, y: 90}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &406764245
 GameObject:
@@ -4369,20 +4389,20 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 474199181}
   m_TextComponent: {fileID: 1984498394}
   m_Placeholder: {fileID: 1700797807}
-  m_ContentType: 2
+  m_ContentType: 0
   m_InputType: 0
   m_AsteriskChar: 42
-  m_KeyboardType: 4
+  m_KeyboardType: 0
   m_LineType: 0
   m_HideMobileInput: 0
-  m_CharacterValidation: 1
-  m_CharacterLimit: 2
+  m_CharacterValidation: 0
+  m_CharacterLimit: 4
   m_OnEndEdit:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 189882944}
-        m_MethodName: Input_vyska
-        m_Mode: 0
+        m_MethodName: Mod_delka
+        m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -4401,7 +4421,7 @@ MonoBehaviour:
   m_CaretColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
   m_CustomCaretColor: 0
   m_SelectionColor: {r: 0.65882355, g: 0.80784315, b: 1, a: 0.7529412}
-  m_Text: 0
+  m_Text: 1/16
   m_CaretBlinkRate: 0.85
   m_CaretWidth: 1
   m_ReadOnly: 0
@@ -5195,7 +5215,7 @@ MonoBehaviour:
   m_LineType: 0
   m_HideMobileInput: 0
   m_CharacterValidation: 1
-  m_CharacterLimit: 2
+  m_CharacterLimit: 3
   m_OnEndEdit:
     m_PersistentCalls:
       m_Calls:
@@ -5852,7 +5872,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 189882944}
-        m_MethodName: Mod_vyska
+        m_MethodName: Mod_delka
         m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -7089,7 +7109,7 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_Sprite: {fileID: 21300000, guid: 23511d35c9c6e3d409a15778bb90b6d4, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 62bd0f41a5a697543bbbc0bdc802a3bf, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -12455,12 +12475,12 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 189882944}
-        m_MethodName: Mod_vyska
+        m_MethodName: Mod_delka
         m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: -1
+          m_IntArgument: -5
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
@@ -14094,9 +14114,9 @@ RectTransform:
   m_Father: {fileID: 375950492}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 19.5, y: -35}
+  m_AnchorMin: {x: 0, y: 0.5}
+  m_AnchorMax: {x: 0, y: 0.5}
+  m_AnchoredPosition: {x: 19.5, y: 0}
   m_SizeDelta: {x: 36, y: 48}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1264926891
@@ -14809,7 +14829,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 260863454}
-  m_RootOrder: 5
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -15761,7 +15781,7 @@ MonoBehaviour:
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: -1
+          m_IntArgument: -5
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
@@ -16152,10 +16172,38 @@ MonoBehaviour:
   m_CaptionImage: {fileID: 315503780}
   m_ItemText: {fileID: 0}
   m_ItemImage: {fileID: 0}
-  m_Value: 0
+  m_Value: 8
   m_Options:
     m_Options:
-    - m_Text: c dur
+    - m_Text: Ces-dur (as-moll)
+      m_Image: {fileID: 21300000, guid: bad459777e73b964fbf9c63207ad163a, type: 3}
+    - m_Text: Ges-dur (es-moll)
+      m_Image: {fileID: 21300000, guid: bad459777e73b964fbf9c63207ad163a, type: 3}
+    - m_Text: Des-dur (b-moll)
+      m_Image: {fileID: 21300000, guid: bad459777e73b964fbf9c63207ad163a, type: 3}
+    - m_Text: As-dur (f-moll)
+      m_Image: {fileID: 21300000, guid: bad459777e73b964fbf9c63207ad163a, type: 3}
+    - m_Text: Es-dur (c-moll)
+      m_Image: {fileID: 21300000, guid: bad459777e73b964fbf9c63207ad163a, type: 3}
+    - m_Text: B-dur (g-moll)
+      m_Image: {fileID: 21300000, guid: bad459777e73b964fbf9c63207ad163a, type: 3}
+    - m_Text: F-dur (d-moll)
+      m_Image: {fileID: 21300000, guid: bad459777e73b964fbf9c63207ad163a, type: 3}
+    - m_Text: C-dur (a-moll)
+      m_Image: {fileID: 21300000, guid: bad459777e73b964fbf9c63207ad163a, type: 3}
+    - m_Text: G-dur (e-moll)
+      m_Image: {fileID: 21300000, guid: bad459777e73b964fbf9c63207ad163a, type: 3}
+    - m_Text: D-dur (h-moll)
+      m_Image: {fileID: 21300000, guid: bad459777e73b964fbf9c63207ad163a, type: 3}
+    - m_Text: A-dur (fis-moll)
+      m_Image: {fileID: 21300000, guid: bad459777e73b964fbf9c63207ad163a, type: 3}
+    - m_Text: E-dur (cis-moll)
+      m_Image: {fileID: 21300000, guid: bad459777e73b964fbf9c63207ad163a, type: 3}
+    - m_Text: H-dur (gis-moll)
+      m_Image: {fileID: 21300000, guid: bad459777e73b964fbf9c63207ad163a, type: 3}
+    - m_Text: Fis-dur (dis-moll)
+      m_Image: {fileID: 21300000, guid: bad459777e73b964fbf9c63207ad163a, type: 3}
+    - m_Text: Cis-dur (ais-moll)
       m_Image: {fileID: 21300000, guid: bad459777e73b964fbf9c63207ad163a, type: 3}
   m_OnValueChanged:
     m_PersistentCalls:
@@ -16286,14 +16334,14 @@ MonoBehaviour:
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 1
+          m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
     m_TypeName: UnityEngine.UI.Toggle+ToggleEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
-  m_IsOn: 1
+  m_IsOn: 0
 --- !u!1 &1433883357
 GameObject:
   m_ObjectHideFlags: 0
@@ -17464,9 +17512,9 @@ RectTransform:
   m_Father: {fileID: 2089517501}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -180, y: 233}
+  m_AnchorMin: {x: 0.5, y: 1}
+  m_AnchorMax: {x: 0.5, y: 1}
+  m_AnchoredPosition: {x: -180, y: -56}
   m_SizeDelta: {x: 24, y: 36}
   m_Pivot: {x: 0.5, y: 0.294}
 --- !u!114 &1563146960
@@ -18897,6 +18945,80 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!1 &1783601989
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1783601990}
+  - component: {fileID: 1783601992}
+  - component: {fileID: 1783601991}
+  m_Layer: 5
+  m_Name: carka licha
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!224 &1783601990
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1783601989}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 260863454}
+  m_RootOrder: 5
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.1875}
+  m_AnchorMax: {x: 0.5, y: 0.1875}
+  m_AnchoredPosition: {x: 0, y: 0.31}
+  m_SizeDelta: {x: 26, y: 39}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1783601991
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1783601989}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -765806418, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
+      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  m_Sprite: {fileID: 21300000, guid: 9c01e1b71a418654087e00a4db26a317, type: 3}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+--- !u!222 &1783601992
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1783601989}
+  m_CullTransparentMesh: 0
 --- !u!1 &1798053434
 GameObject:
   m_ObjectHideFlags: 0
@@ -18984,7 +19106,7 @@ MonoBehaviour:
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 2
+          m_IntArgument: 1
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
@@ -19281,7 +19403,7 @@ GameObject:
   - component: {fileID: 1834274317}
   - component: {fileID: 1834274316}
   m_Layer: 5
-  m_Name: carka
+  m_Name: carka suda
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -19299,11 +19421,11 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 260863454}
-  m_RootOrder: 3
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.1875}
   m_AnchorMax: {x: 0.5, y: 0.1875}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 3.43}
   m_SizeDelta: {x: 26, y: 39}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1834274316
@@ -20935,6 +21057,11 @@ MonoBehaviour:
   Nota_ctvrt: {fileID: 21300000, guid: 47f746d034d1ebf45a80d5793fafb916, type: 3}
   Nota_prapor: {fileID: 21300000, guid: 44ede191d967e2449a1bafda1d4f5131, type: 3}
   Nota_carka: {fileID: 21300000, guid: 94db674ab2cfdd84ea37e2b50b4cb5e1, type: 3}
+  P_cela: {fileID: 21300000, guid: b5e7e9f831d3f8149958c765519a52a5, type: 3}
+  P_pull: {fileID: 21300000, guid: 98b46030c804c7c408018e6b2c322e1c, type: 3}
+  P_ctvrt: {fileID: 21300000, guid: 611b797292197df4e8967d84f8d0cc51, type: 3}
+  P_osmina: {fileID: 21300000, guid: 7c7aa6ed8a97aec418b9d369ab081e17, type: 3}
+  P_sestnactina: {fileID: 21300000, guid: cec8e016c65a3eb4eb3384a379744d8c, type: 3}
 --- !u!1 &1984498392
 GameObject:
   m_ObjectHideFlags: 0
@@ -20970,7 +21097,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: -8, y: -4}
+  m_SizeDelta: {x: -2, y: -4}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1984498394
 MonoBehaviour:
@@ -21005,7 +21132,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 0
+  m_Text: 1/16
 --- !u!222 &1984498395
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -21092,7 +21219,29 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2011667230}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 189882940}
+        m_MethodName: SetActive
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 189882944}
+        m_MethodName: Send_data
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!114 &2011667230
@@ -21597,7 +21746,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 260863454}
-  m_RootOrder: 4
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -22176,7 +22325,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 189882944}
-        m_MethodName: Mod_vyska
+        m_MethodName: Mod_delka
         m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

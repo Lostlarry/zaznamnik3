@@ -99,8 +99,7 @@ public class Znak : MonoBehaviour
     public virtual bool FromString(string input)
     {
         bool error = false;
-        char[] filter = new char[1];
-        filter[0] = ',';
+        char[] filter = new char[1] { ',' };
         string[] data = input.Split(filter, StringSplitOptions.RemoveEmptyEntries);
         if (data[0] == "Z")
         {
@@ -170,7 +169,15 @@ public class Znak : MonoBehaviour
     {
         return new int[2] {0, delka};
     }
-    
+
+    public virtual void Paste(int[] input)
+    {
+        if (input[0] == 0)
+        {
+            delka = input[1];
+        }
+    }
+
     protected virtual void Update_gfx()
     {
         
@@ -228,8 +235,7 @@ public class Nota : Znak
     public override bool FromString(string input)
     {
         bool error = false;
-        char[] filter = new char[1];
-        filter[0] = ',';
+        char[] filter = new char[1] { ',' };
         string[] data = input.Split(filter, StringSplitOptions.RemoveEmptyEntries);
         if (data[0] == "N")
         {
@@ -282,25 +288,167 @@ public class Nota : Znak
         return new int[6] {2, delka, postfix, prefix, topfix, vyska};
     }
 
+    public override void Paste(int[] input)
+    {
+        if (input[0] == 2)
+        {
+            delka = input[1];
+            postfix = input[2];
+            prefix = input[3];
+            topfix = input[4];
+            vyska = input[5];
+        }
+    }
+
     protected override void Update_gfx()
     {
-        if (delka < -1)
+        // vyska a prevraceni
+        gameObject.transform.position = ref_point + new Vector3(0, vyska * Znak.nota_height);
+        if (vyska > 1)
         {
-            gameObject.GetComponent<Image>().sprite = Gfx_src.Nota_ctvrt;
-            for (int i = -1; i < delka; i++)
-            {
-
-            }
-        }
-        else if (delka == -1)
-        {
-            gameObject.GetComponent<Image>().sprite = Gfx_src.Nota_pull;
+            gameObject.transform.rotation = Quaternion.Euler(0f, 0f, 180f);
+            prefix_GO.transform.position = new Vector3(-Math.Abs(prefix_GO.transform.position.x), prefix_GO.transform.position.y, prefix_GO.transform.position.z);
+            prefix_GO.transform.rotation = Quaternion.Euler(0f, 0f, 180f);
         }
         else
         {
-            gameObject.GetComponent<Image>().sprite = Gfx_src.Nota_cela;
+            gameObject.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
+            prefix_GO.transform.position = new Vector3(Math.Abs(prefix_GO.transform.position.x), prefix_GO.transform.position.y, prefix_GO.transform.position.z);
+            prefix_GO.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
         }
-        base.Update_gfx();
+        //pomocne carky
+        if (vyska < -3)
+        {
+            GameObject select;
+            if (vyska % 2 == 0)
+            {
+                select = carka_suda;
+                carka_suda.SetActive(true);
+                carka_licha.SetActive(false);
+            }
+            else
+            {
+                select = carka_licha;
+                float dist = carka_suda.transform.position.y - carka_licha.transform.position.y;
+                carka_licha.transform.position = new Vector3(carka_suda.transform.position.x, carka_suda.transform.position.y + Math.Abs(dist), carka_suda.transform.position.z);
+                carka_licha.SetActive(true);
+                carka_suda.SetActive(false);
+            }
+            int targ_carek = (Math.Abs(vyska) - 2) / 2 - 1;
+            for (int i = 0; i < carky.GetLength(0); i++)
+            {
+                Destroy(carky[i]);
+            }
+            carky = new GameObject[targ_carek];
+            for (int i = 0; i < targ_carek; i++)
+            {
+                carky[i] = Instantiate(select, gameObject.transform, true);
+                carky[i].transform.position = new Vector3(select.transform.position.x, select.transform.position.y + 2 * Znak.nota_height * (i + 1), select.transform.position.z);
+            }
+        }
+        else if (vyska > 7)
+        {
+            GameObject select;
+            if (vyska % 2 == 0)
+            {
+                select = carka_suda;
+                carka_suda.SetActive(true);
+                carka_licha.SetActive(false);
+            }
+            else
+            {
+                select = carka_licha;
+                float dist = carka_suda.transform.position.y - carka_licha.transform.position.y;
+                carka_licha.transform.position = new Vector3(carka_suda.transform.position.x, carka_suda.transform.position.y - Math.Abs(dist), carka_suda.transform.position.z);
+                carka_licha.SetActive(true);
+                carka_suda.SetActive(false);
+            }
+            int targ_carek = (Math.Abs(vyska) - 6) / 2 - 1;
+            for (int i = 0; i < carky.GetLength(0); i++)
+            {
+                Destroy(carky[i]);
+            }
+            carky = new GameObject[targ_carek];
+            for (int i = 0; i < targ_carek; i++)
+            {
+                carky[i] = Instantiate(select, gameObject.transform, true);
+                carky[i].transform.position = new Vector3(select.transform.position.x, select.transform.position.y - 2 * Znak.nota_height * (i + 1), select.transform.position.z);
+            }
+        }
+        else
+        {
+            carka_licha.SetActive(false);
+            carka_suda.SetActive(false);
+            for (int i = 0; i < carky.GetLength(0); i++)
+            {
+                carky[i].SetActive(false);
+            }
+        }
+        // prefix becka krizky
+        switch (prefix)
+        {
+            case 1:
+                prefix_GO.SetActive(true);
+                prefix_GO.GetComponent<Image>().sprite = Gfx.Prefix_krizek;
+                break;
+            case 2:
+                prefix_GO.SetActive(true);
+                prefix_GO.GetComponent<Image>().sprite = Gfx.Prefix_becko;
+                break;
+            case 3:
+                prefix_GO.SetActive(true);
+                prefix_GO.GetComponent<Image>().sprite = Gfx.Prefix_neutral;
+                break;
+            default:
+                prefix_GO.SetActive(false);
+                break;
+        }
+        //delka not
+        if (delka < -1)
+        {
+            gameObject.GetComponent<Image>().sprite = Gfx.Nota_ctvrt;
+            if (delka < -2)
+            {
+                prapor_GOs[0].SetActive(true);
+                if (delka == -4)
+                {
+                    prapor_GOs[1].SetActive(true);
+                }
+                else
+                {
+                    prapor_GOs[1].SetActive(false);
+                }
+            }
+            else
+            {
+                prapor_GOs[1].SetActive(false);
+                prapor_GOs[0].SetActive(false);
+            }
+        }
+        else
+        {
+            if (delka == -1)
+            {
+                gameObject.GetComponent<Image>().sprite = Gfx.Nota_pull;
+            }
+            else
+            {
+                gameObject.GetComponent<Image>().sprite = Gfx.Nota_cela;
+            }
+            for (int i = 0; i < prapor_GOs.GetLength(0); i++)
+            {
+                prapor_GOs[i].SetActive(false);
+            }
+        }
+        //topfix
+        if (topfix != 0)
+        {
+            topfix_GO.SetActive(true);
+        }
+        else
+        {
+            topfix_GO.SetActive(false);
+        }
     }
 }
 
@@ -322,8 +470,7 @@ class Pomlka : Znak
     public override bool FromString(string input)
     {
         bool error = false;
-        char[] filter = new char[1];
-        filter[0] = ',';
+        char[] filter = new char[1] { ',' };
         string[] data = input.Split(filter, StringSplitOptions.RemoveEmptyEntries);
         if (data[0] == "P")
         {
@@ -359,6 +506,15 @@ class Pomlka : Znak
         return new int[3] {1, delka, postfix};
     }
 
+    public override void Paste(int[] input)
+    {
+        if (input[0] == 1)
+        {
+            delka = input[1];
+            postfix = input[2];
+        }
+    }
+
     protected override void Do_lig()
     {
 
@@ -368,21 +524,16 @@ class Pomlka : Znak
 class Acord : Znak
 {
     Nota start;
-
-    int vyska = 0; // relativne ku spodni radce relativne k prvni note
+    
     
     int topfix = 0;// 0 = nic 1 
 
     public override void Nota_Up(int i = 1)
     {
-        vyska = i + vyska;
-        Calc_Pos();
     }
 
     public override void Nota_Down(int i = 1)
     {
-        vyska = i - vyska;
-        Calc_Pos();
     }
 
     public override string ToString()
@@ -393,7 +544,7 @@ class Acord : Znak
         {
             output = output + selected.ToString();
         }
-        return "A," + delka + "," + vyska + "," + output + ";";
+        return "A," + delka + "," + output + ";";
     }
 
     public override bool is_nota()
@@ -404,8 +555,7 @@ class Acord : Znak
     public override bool FromString(string input)
     {
         bool error = false;
-        char[] filter = new char[1];
-        filter[0] = ',';
+        char[] filter = new char[1] { ',' };
         string[] data = input.Split(filter, StringSplitOptions.RemoveEmptyEntries);
         if (data[0] == "A")
         {
@@ -413,15 +563,6 @@ class Acord : Znak
             if (int.TryParse(data[1], out output))
             {
                 delka = output;
-            }
-            else
-            {
-                error = true;
-            }
-
-            if (int.TryParse(data[2], out output))
-            {
-                vyska = output;
             }
             else
             {
@@ -437,7 +578,15 @@ class Acord : Znak
     }
     public override int[] Copy()
     {
-        return new int[4] { 3, delka, topfix, vyska };
+        return new int[3] { 3, delka, topfix};
+    }
+    public override void Paste(int[] input)
+    {
+        if (input[0] == 3)
+        {
+            delka = input[1];
+            topfix = input[2];
+        }
     }
 }
 

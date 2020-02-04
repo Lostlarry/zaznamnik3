@@ -15,6 +15,12 @@ public class Grafix_bank : MonoBehaviour
     public Sprite Nota_prapor;
     public Sprite Nota_carka;
 
+    public Sprite P_cela;
+    public Sprite P_pull;
+    public Sprite P_ctvrt;
+    public Sprite P_osmina;
+    public Sprite P_sestnactina;
+
     // Start is called before the first frame update
     void Start()
     {

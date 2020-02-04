@@ -7,7 +7,7 @@ using UnityEngine.UI;
 public class HUD_ctrl : MonoBehaviour
 {
     const float modx = -180f;
-    const float mody = 233f;
+    const float mody = -56f;
 
     public Hand_Ctrl CTRL;
     public GameObject[] toggle_able;
@@ -19,7 +19,7 @@ public class HUD_ctrl : MonoBehaviour
     public virtual void Adjust_HUD(Znak target)
     {
         Vector3 master_scale = gameObject.transform.parent.position;
-        Vector3 ref_point = new Vector3(master_scale.x + modx, master_scale.y + mody);
+        Vector3 ref_point = new Vector3(master_scale.x + modx, master_scale.y * 2 + mody);
         if (select)
         {
             gameObject.transform.position = ref_point + new Vector3(target.Pos_x * Znak.takt_width, target.Pos_y * Hand_Ctrl.vyska_linek, 0);

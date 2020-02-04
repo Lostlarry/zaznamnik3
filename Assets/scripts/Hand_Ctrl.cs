@@ -50,8 +50,7 @@ public class Hand_Ctrl : MonoBehaviour
         //hands count not loaded * hands count invalid * no hands loaded * invalid string * N/P when no hand tag * invalid datatype * subtype destring error * more hands then hand count * less hands then hand count
         errors = new bool[9] {false, false, false, false, false, false, false, false, false};
         Reset();
-        char[] filter = new char[1];
-        filter[0] = ';';
+        char[] filter = new char[1] { ';'};
         string[] data = input.Split(filter, StringSplitOptions.RemoveEmptyEntries);
         filter[0] = ',';
         string[] localdata = data[0].Split(filter, StringSplitOptions.RemoveEmptyEntries);
