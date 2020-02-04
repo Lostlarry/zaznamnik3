@@ -24,7 +24,7 @@ public class Grafix_bank : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Znak.Gfx_src = this;
+        Znak.Gfx = this;
     }
 
     // Update is called once per frame

@@ -167,6 +167,10 @@ public class Hand_Ctrl : MonoBehaviour
 
     Nota Add_Nota(Holder hand, Znak target = null)
     {
+        if (hand == null)
+        {
+            hand = hands[0];
+        }
         Select_hand(hand);
         bool middle = true;
         if (target == null)
@@ -179,6 +183,7 @@ public class Hand_Ctrl : MonoBehaviour
         GO.SetActive(true);
         not++;
         Nota made = GO.AddComponent<Nota>();
+        made.Do_data();
         made.master = hand;
         if (target != null)
         {
@@ -210,6 +215,10 @@ public class Hand_Ctrl : MonoBehaviour
 
     Pomlka Add_Pomlka(Holder hand, Znak target = null)
     {
+        if (hand == null)
+        {
+            hand = hands[0];
+        }
         Select_hand(hand);
         bool middle = true;
         if (target == null)
@@ -221,16 +230,29 @@ public class Hand_Ctrl : MonoBehaviour
         GO.name = "note " + not;
         not++;
         Pomlka made = GO.AddComponent<Pomlka>();
+        made.Do_data();
         made.master = hand;
         if (target != null)
         {
-            if (middle)
+            if (middle && target.Next != null)
             {
                 made.Next = target.Next;
-                Recalc(made.Next);
+                Recalc(made.Next, true);
+            }
+            else
+            {
+                made.master.Posledni = made;
             }
             target.Next = made;
             made.Prev = target;
+            made.Transfer_pos(target);
+            made.Bump_pos();
+        }
+        else
+        {
+            made.master.Prvni = made;
+            made.master.Posledni = made;
+            made.Calc_Pos();
         }
         hand.vybrany = made;
         Select_HUD.Adjust_HUD(made);
@@ -507,7 +529,7 @@ public class Hand_Ctrl : MonoBehaviour
         {
             hands[i] = new Holder();
             Add_line(hands[i]);
-            Add_Nota((hands[i]));
+            Add_Nota(hands[i]);
             hands[i].Prvni.gameObject.transform.position = proto_nota.transform.position;
         }
     }
@@ -561,19 +583,23 @@ public class Hand_Ctrl : MonoBehaviour
     void Start()
     {
         Znak.CTRL = this;
+        Znak.ref_point = proto_nota.transform.position;
     }
     void Update(){}
 
     public void Recalc(Znak target, bool force = false)
     {
-        while (target.Next != null)
+        if (target != null)
         {
-            target.Calc_Pos(true);
-            target = target.Next;
-        }
-        if (target.Bump_pos())
-        {
-            Add_line(target.master);
+            while (target.Next != null)
+            {
+                target.Calc_Pos(true);
+                target = target.Next;
+            }
+            if (target.Bump_pos())
+            {
+                Add_line(target.master);
+            } 
         }
     }
 

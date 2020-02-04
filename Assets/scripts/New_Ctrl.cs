@@ -32,7 +32,7 @@ public class New_Ctrl : MonoBehaviour
         }
         int[] data = new int[hand_amt + 3];
         data[0] = hand_amt;
-        data[1] = kids[1].GetComponent<Dropdown>().value - 8;
+        data[1] = kids[1].GetComponent<Dropdown>().value-7;
         data[2] = kids[2].GetComponent<Dropdown>().value;
         for (int i = 0; i < hand_amt; i++)
         {

@@ -12,7 +12,7 @@ public class Save_Load : MonoBehaviour
     string input = "";
 
     public bool Save()
-    {
+    {/*
         string savefile = strEx("Save File", "nml", "/saves");
         if (savefile != "")
         {
@@ -21,11 +21,11 @@ public class Save_Load : MonoBehaviour
             writer.WriteLine(output);
             writer.Close();
             return true;
-        }
+        }*/
         return false;
     }
     public bool Load()
-    {
+    {/*
         string savefile = strEx("Load File", "nml", "/saves");
         if ( savefile != "")
         {
@@ -34,15 +34,15 @@ public class Save_Load : MonoBehaviour
             input = reader.ReadLine();
             reader.Close();
             return true;
-        }
+        }*/
         return false;
     }
-
+    /*
     string strEx(string name, string ext, string add = "")
     {
         return EditorUtility.OpenFilePanel(name, add, ext);
     }
-
+    */
     public string getString()
     {
         return input;

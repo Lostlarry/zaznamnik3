@@ -6,8 +6,9 @@ using UnityEngine.UI;
 
 public class Znak : MonoBehaviour
 {
-    public static Grafix_bank Gfx_src;
+    public static Grafix_bank Gfx;
     public static Hand_Ctrl CTRL;
+    public static Vector3 ref_point;
 
     public const int notes_per_line = 16;
     public const float takt_width = 26.4f;
@@ -41,7 +42,7 @@ public class Znak : MonoBehaviour
             Transfer_pos(prev);
             Bump_pos();
         }
-        gameObject.transform.position = gameObject.transform.position + new Vector3((pos_x * takt_width), pos_y * Hand_Ctrl.vyska_linek, 0);
+        gameObject.transform.position = ref_point + new Vector3((pos_x * takt_width), pos_y * Hand_Ctrl.vyska_linek, 0);
     }
 
     public void Swap_Pos(Znak target)
@@ -78,6 +79,10 @@ public class Znak : MonoBehaviour
         if (delka > 0)
         {
 
+        }
+        else if(delka < -4)
+        {
+            delka = -4;
         }
         Update_gfx();
     }
@@ -154,7 +159,7 @@ public class Znak : MonoBehaviour
         bool output = false;
         float mod = 2^prev.delka;
         mod = mod + 0.5f * prev.Postfix;
-        pos_x = pos_x + mod;
+        pos_x = prev.pos_x + mod;
         if (pos_x > notes_per_line)
         {
             pos_x = pos_x - notes_per_line;
@@ -175,13 +180,14 @@ public class Znak : MonoBehaviour
         if (input[0] == 0)
         {
             delka = input[1];
+            Calc_Pos();
+            Update_gfx();
+            CTRL.Recalc(next);
         }
     }
 
-    protected virtual void Update_gfx()
-    {
-        
-    }
+    protected virtual void Update_gfx() { }
+    public virtual void Do_data() { }
 
     void Start() { }
     void Update() { }
@@ -189,14 +195,22 @@ public class Znak : MonoBehaviour
 
 public class Nota : Znak
 {
+    
+    GameObject prefix_GO;
+    GameObject topfix_GO;
+    GameObject postfix_GO;
 
+    GameObject carka_licha;
+    GameObject carka_suda;
+    GameObject[] carky;
+
+    GameObject[] prapor_GOs;
+    
     int vyska = 0; // relativne ku spodni radce
 
     int prefix = 0;// 0= nic 1 = krizky 2 = becka 3 = cista 
-    int postfix = 0;// 0 = nic 1 az 3 tecky(prida pulku delky)
+    int postfix = 0;// 0 = nic 1 = tecka(delka * 1,5)
     int topfix = 0;// 0 = nic 1 
-
-    public GameObject prapor;
 
     public override int Postfix { get => postfix; set => postfix = value; }
 
@@ -207,7 +221,20 @@ public class Nota : Znak
             Transfer_pos(prev);
             Bump_pos();
         }
-        gameObject.transform.position = gameObject.transform.position + new Vector3(pos_x * takt_width, pos_y * Hand_Ctrl.vyska_linek + vyska * nota_height, 0);
+        gameObject.transform.position = ref_point + new Vector3(pos_x * takt_width, pos_y * Hand_Ctrl.vyska_linek + vyska * nota_height, 0);
+        //prevraceni
+        if (vyska > 1)
+        {
+            gameObject.transform.rotation = Quaternion.Euler(0f, 0f, 180f);
+            prefix_GO.transform.position = new Vector3(-Math.Abs(prefix_GO.transform.position.x), prefix_GO.transform.position.y, prefix_GO.transform.position.z);
+            prefix_GO.transform.rotation = Quaternion.Euler(0f, 0f, 180f);
+        }
+        else
+        {
+            gameObject.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
+            prefix_GO.transform.position = new Vector3(Math.Abs(prefix_GO.transform.position.x), prefix_GO.transform.position.y, prefix_GO.transform.position.z);
+            prefix_GO.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
+        }
     }
 
     public override void Nota_Up(int i = 1)
@@ -297,25 +324,14 @@ public class Nota : Znak
             prefix = input[3];
             topfix = input[4];
             vyska = input[5];
+            Calc_Pos();
+            Update_gfx();
+            CTRL.Recalc(next);
         }
     }
 
     protected override void Update_gfx()
     {
-        // vyska a prevraceni
-        gameObject.transform.position = ref_point + new Vector3(0, vyska * Znak.nota_height);
-        if (vyska > 1)
-        {
-            gameObject.transform.rotation = Quaternion.Euler(0f, 0f, 180f);
-            prefix_GO.transform.position = new Vector3(-Math.Abs(prefix_GO.transform.position.x), prefix_GO.transform.position.y, prefix_GO.transform.position.z);
-            prefix_GO.transform.rotation = Quaternion.Euler(0f, 0f, 180f);
-        }
-        else
-        {
-            gameObject.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
-            prefix_GO.transform.position = new Vector3(Math.Abs(prefix_GO.transform.position.x), prefix_GO.transform.position.y, prefix_GO.transform.position.z);
-            prefix_GO.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
-        }
         //pomocne carky
         if (vyska < -3)
         {
@@ -449,17 +465,42 @@ public class Nota : Znak
         {
             topfix_GO.SetActive(false);
         }
+        //postfix
+        if (postfix != 0)
+        {
+            postfix_GO.SetActive(true);
+        }
+        else
+        {
+            postfix_GO.SetActive(false);
+        }
+    }
+
+    public override void Do_data()
+    {
+        prapor_GOs = new GameObject[2];
+        prefix_GO = gameObject.transform.GetChild(1).gameObject;
+        postfix_GO = gameObject.transform.GetChild(2).gameObject;
+        topfix_GO = gameObject.transform.GetChild(3).gameObject;
+        prapor_GOs[0] = gameObject.transform.GetChild(4).gameObject;
+        prapor_GOs[1] = gameObject.transform.GetChild(5).gameObject;
+        carka_licha = gameObject.transform.GetChild(6).gameObject;
+        carka_suda = gameObject.transform.GetChild(7).gameObject;
+        carky = new GameObject[1];
+        carky[0] = Instantiate(carka_licha, gameObject.transform);
+        carky[0].SetActive(false);
+        Update_gfx();
     }
 }
 
 class Pomlka : Znak
 {
-
-    int postfix = 0;// 0 = nic 1 az 3 tecky(prida pulku delky)
+    GameObject postfix_GO;
+    int postfix = 0;// 0 = nic 1 = tecka(delka * 1,5)
 
     public override string ToString()
     {
-        return "N," + delka + "," + postfix + ";";
+        return "P," + delka + "," + postfix + ";";
     }
 
     public override bool is_nota()
@@ -512,6 +553,9 @@ class Pomlka : Znak
         {
             delka = input[1];
             postfix = input[2];
+            Calc_Pos();
+            Update_gfx();
+            CTRL.Recalc(next);
         }
     }
 
@@ -519,12 +563,52 @@ class Pomlka : Znak
     {
 
     }
+
+    protected override void Update_gfx()
+    {
+        //delka pomka
+        switch (delka)
+        {
+            case 0:
+                gameObject.GetComponent<Image>().sprite = Gfx.P_cela;
+                break;
+            case -1:
+                gameObject.GetComponent<Image>().sprite = Gfx.P_pull;
+                break;
+            case -2:
+                gameObject.GetComponent<Image>().sprite = Gfx.P_ctvrt;
+                break;
+            case -3:
+                gameObject.GetComponent<Image>().sprite = Gfx.P_osmina;
+                break;
+            case -4:
+                gameObject.GetComponent<Image>().sprite = Gfx.P_sestnactina;
+                break;
+            default:
+                break;
+        }
+
+        //postfix
+        if (postfix != 0)
+        {
+            postfix_GO.SetActive(true);
+        }
+        else
+        {
+            postfix_GO.SetActive(false);
+        }
+    }
+
+    public override void Do_data()
+    {
+        postfix_GO = gameObject.transform.GetChild(2).gameObject;
+        Update_gfx();
+    }
 }
 
-class Acord : Znak
+class Acord : Znak//not in use
 {
     Nota start;
-    
     
     int topfix = 0;// 0 = nic 1 
 
