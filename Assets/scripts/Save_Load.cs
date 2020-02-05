@@ -23,13 +23,13 @@ public class Save_Load : MonoBehaviour
             return true;
         }*/
         return false;
+        
     }
     public bool Load()
     {/*
         string savefile = strEx("Load File", "nml", "/saves");
         if ( savefile != "")
         {
-            Debug.Log("\""+savefile+"\"");
             TextReader reader = new StreamReader(savefile);
             input = reader.ReadLine();
             reader.Close();

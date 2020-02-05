@@ -162,7 +162,7 @@ public class Znak : MonoBehaviour
         pos_x = prev.pos_x + mod;
         if (pos_x > notes_per_line)
         {
-            pos_x = pos_x - notes_per_line;
+            pos_x = 0;
             pos_y++;
             output = true;
         }
