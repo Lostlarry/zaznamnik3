@@ -100,20 +100,25 @@ public class Change_ctrl : MonoBehaviour
 
     public void Set_data(Znak target)
     {
-        target_note = target;
-        pred.Activate(CTRL.predznamenani);
-        int[] output = prototype.Copy(target);
-        Vyska_txt.text = output[0].ToString();
-        Delka_txt.text = output[1].ToString();
-        if (output[2] == 1)
+        if (!swaping)
         {
-            nota.isOn = true;
-            pomlka.isOn = false;
-        }
-        else
-        {
-            nota.isOn = false;
-            pomlka.isOn = true;
+            swaping = true;
+            target_note = target;
+            pred.Activate(CTRL.predznamenani);
+            int[] output = prototype.Copy(target);
+            Vyska_txt.text = output[0].ToString();
+            Delka_txt.text = output[1].ToString();
+            if (output[2] == 1)
+            {
+                nota.isOn = true;
+                pomlka.isOn = false;
+            }
+            else
+            {
+                nota.isOn = false;
+                pomlka.isOn = true;
+            }
+            swaping = false;
         }
     }
 
@@ -124,22 +129,36 @@ public class Change_ctrl : MonoBehaviour
 
     public void Control_prefix()
     {
-        swaping = true;
-        int result = pred.Is_moded(prototype.Vyska);
-        if (result == 1)
+        if (!swaping)
         {
-            prefix[1].enabled = false;//krizek blokuje becko
-            prefix[1].isOn = false;
-        }
-        else if (result == 2)
-        {
-            prefix[0].enabled = false;//becko blokuje krizek
-            prefix[0].isOn = false;
-        }
-        else
-        {
-            prefix[2].enabled = false;//zadny predznamanani blokuje odrazku
-            prefix[2].isOn = false;
+            swaping = true;
+            if (nota)
+            {
+                int result = pred.Is_moded(prototype.Vyska);
+                if (result == 1)
+                {
+                    prefix[1].enabled = false;//krizek blokuje becko
+                    prefix[1].isOn = false;
+                }
+                else if (result == 2)
+                {
+                    prefix[0].enabled = false;//becko blokuje krizek
+                    prefix[0].isOn = false;
+                }
+                else
+                {
+                    prefix[2].enabled = false;//zadny predznamanani blokuje odrazku
+                    prefix[2].isOn = false;
+                }
+            }
+            else
+            {
+                for (int i = 0; i < prefix.GetLength(0); i++)
+                {
+                    prefix[i].enabled = false;//becko blokuje krizek
+                    prefix[i].isOn = false;
+                }
+            } 
         }
         swaping = false;
     }

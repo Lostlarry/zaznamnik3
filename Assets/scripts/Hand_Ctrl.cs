@@ -28,7 +28,6 @@ public class Hand_Ctrl : MonoBehaviour
 
     public override string ToString()
     {
-
         string dat = "";
         for (int i = hands.GetLength(0); i > 0; i--)
         {
@@ -185,6 +184,7 @@ public class Hand_Ctrl : MonoBehaviour
         Nota made = GO.AddComponent<Nota>();
         made.Do_data();
         made.master = hand;
+        made.Hand_id = hands.GetLength(0) - 1 + hand.id;
         if (target != null)
         {
             if (middle && target.Next != null)
@@ -232,6 +232,7 @@ public class Hand_Ctrl : MonoBehaviour
         Pomlka made = GO.AddComponent<Pomlka>();
         made.Do_data();
         made.master = hand;
+        made.Hand_id = hands.GetLength(0) - 1 + hand.id;
         if (target != null)
         {
             if (middle && target.Next != null)
@@ -528,6 +529,7 @@ public class Hand_Ctrl : MonoBehaviour
         for (int i = 0; i < data[0]; i++)
         {
             hands[i] = new Holder();
+            hands[i].id = i;
             Add_line(hands[i]);
             Add_Nota(hands[i]);
             hands[i].Prvni.gameObject.transform.position = proto_nota.transform.position;
@@ -611,6 +613,7 @@ public class Hand_Ctrl : MonoBehaviour
 
 public class Holder
 {
+    public int id;
     public Znak vybrany;
     public Znak Prvni;
     public Znak Posledni;

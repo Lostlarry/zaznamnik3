@@ -23,12 +23,15 @@ public class Znak : MonoBehaviour
 
     protected float pos_x = 0;
     protected int pos_y = 0;
+    protected int hand_id = 0;
 
     public Znak Prev { get => prev; set => prev = value; }
     public Znak Next { get => next; set => next = value; }
     public float Pos_x { get => pos_x; set => pos_x = value; }
     public int Pos_y { get => pos_y; set => pos_y = value; }
     public virtual int Postfix { get { return 0; } set { } }
+
+    public int Hand_id { get => hand_id; set => hand_id = value; }
 
     public void Load(Znak Z)
     {
@@ -42,7 +45,12 @@ public class Znak : MonoBehaviour
             Transfer_pos(prev);
             Bump_pos();
         }
-        gameObject.transform.position = ref_point + new Vector3((pos_x * takt_width), pos_y * Hand_Ctrl.vyska_linek, 0);
+        int mod = 0;
+        if (hand_id > 0)
+        {
+            mod = hand_id - 1 + pos_y;
+        }
+        gameObject.transform.position = ref_point + new Vector3((pos_x * takt_width), (pos_y + mod) * Hand_Ctrl.vyska_linek, 0);
     }
 
     public void Swap_Pos(Znak target)
@@ -144,6 +152,7 @@ public class Znak : MonoBehaviour
             target.Next.Prev = this;
         }
         master = target.master;
+        hand_id = target.hand_id;
         pos_x = target.pos_x;
         pos_y = target.pos_y;
     }
