@@ -20,9 +20,14 @@ public class HUD_ctrl : MonoBehaviour
     {
         Vector3 master_scale = gameObject.transform.parent.position;
         Vector3 ref_point = new Vector3(master_scale.x + modx, master_scale.y * 2 + mody);
+        int mod = 0;
+        if (target.Hand_id > 0)
+        {
+            mod = target.Hand_id - 1 + target.Pos_y;
+        }
         if (select)
         {
-            gameObject.transform.position = ref_point + new Vector3(target.Pos_x * Znak.takt_width, target.Pos_y * Hand_Ctrl.vyska_linek, 0);
+            gameObject.transform.position = ref_point + new Vector3(target.Pos_x * Znak.takt_width, (mod + target.Pos_y) * Hand_Ctrl.vyska_linek, 0);
             for (int i = 0; i < toggle_able.GetLength(0); i++)
             {
                 toggle_able[i].SetActive(target.is_nota());
@@ -36,13 +41,13 @@ public class HUD_ctrl : MonoBehaviour
         {
             int posy = target.Pos_y;
             float posx = target.Pos_x + 1;
-            if(posx > Znak.notes_per_line)
+            if(posx > Znak.takts_per_line)
             {
                 Send_Command(10);
                 posy++;
-                posx = posx - Znak.notes_per_line;
+                posx = 0;
             }
-            gameObject.transform.position = ref_point + new Vector3(posx * Znak.takt_width, posy * Hand_Ctrl.vyska_linek, 0);
+            gameObject.transform.position = ref_point + new Vector3(posx * Znak.takt_width, (mod + posy) * Hand_Ctrl.vyska_linek, 0);
         }
     }
 

@@ -9,19 +9,18 @@ public class Hand_Ctrl : MonoBehaviour
     public HUD_ctrl Select_HUD;
     public HUD_ctrl End_HUD;
     public GameObject paper;
+
     public GameObject proto_nota;
     public GameObject proto_linka;
     public GameObject proto_klic;
     public GameObject proto_end;
     public GameObject proto_pred_h;
     public GameObject proto_pred_b;
+    public GameObject proto_takt;
 
     Holder[] hands;
 
     int selected_hand = 0;
-
-    int not = 0;
-    int linek = 0;
 
     public int predznamenani = 0; //0 = cdur kladny jsou krizky, zaporny jsou becka
     public int takt = 1;
@@ -170,7 +169,6 @@ public class Hand_Ctrl : MonoBehaviour
         {
             hand = hands[0];
         }
-        Select_hand(hand);
         bool middle = true;
         if (target == null)
         {
@@ -178,9 +176,9 @@ public class Hand_Ctrl : MonoBehaviour
             middle = false;
         }
         GameObject GO = Instantiate(proto_nota, paper.transform, false);
-        GO.name = "nota " + not;
+        GO.name = "nota " + hand.not + " " + hand.id;
         GO.SetActive(true);
-        not++;
+        hand.not++;
         Nota made = GO.AddComponent<Nota>();
         made.Do_data();
         made.master = hand;
@@ -208,8 +206,8 @@ public class Hand_Ctrl : MonoBehaviour
             made.Calc_Pos();
         }
         hand.vybrany = made;
+        Select_hand(hand);
         Select_HUD.Adjust_HUD(made);
-        End_HUD.Adjust_HUD(hand.Posledni);
         return made;
     }
 
@@ -219,7 +217,6 @@ public class Hand_Ctrl : MonoBehaviour
         {
             hand = hands[0];
         }
-        Select_hand(hand);
         bool middle = true;
         if (target == null)
         {
@@ -227,8 +224,8 @@ public class Hand_Ctrl : MonoBehaviour
             middle = false;
         }
         GameObject GO = Instantiate(proto_nota, paper.transform, false);
-        GO.name = "note " + not;
-        not++;
+        GO.name = "note " + hand.not + " " + hand.id;
+        hand.not++;
         Pomlka made = GO.AddComponent<Pomlka>();
         made.Do_data();
         made.master = hand;
@@ -257,13 +254,13 @@ public class Hand_Ctrl : MonoBehaviour
         }
         hand.vybrany = made;
         Select_HUD.Adjust_HUD(made);
-        End_HUD.Adjust_HUD(hand.Posledni);
+        Select_hand(hand);
         return made;
     }
 
     private void Select_hand(int i)
     {
-        selected_hand = i;
+        selected_hand = i;// used by reset only so its fine
     }
 
     private void Select_hand(Holder hold)
@@ -273,6 +270,7 @@ public class Hand_Ctrl : MonoBehaviour
             if (hands[i] == hold)
             {
                 selected_hand = i;
+                End_HUD.Adjust_HUD(hold.Posledni);
             }
         }
     }
@@ -455,8 +453,6 @@ public class Hand_Ctrl : MonoBehaviour
     public void Reset(int[] data)
     {
         Select_hand(0);
-        not = 0;
-        linek = 0;
         predznamenani = 0;
         takt = 1;
 
@@ -470,8 +466,14 @@ public class Hand_Ctrl : MonoBehaviour
                     while (hands[i].selected.Prev != null)
                     {
                         hands[i].selected = hands[i].selected.Prev;
-                        Destroy(hands[i].selected.Prev.gameObject);
+                        Destroy(hands[i].selected.Next.klic);
+                        Destroy(hands[i].selected.Next.end);
+                        Destroy(hands[i].selected.Next.pred);
+                        Destroy(hands[i].selected.Next.gameObject);
                     }
+                    Destroy(hands[i].selected.klic);
+                    Destroy(hands[i].selected.end);
+                    Destroy(hands[i].selected.pred);
                     Destroy(hands[i].selected.gameObject);
                 }
 
@@ -481,7 +483,7 @@ public class Hand_Ctrl : MonoBehaviour
                     while (hands[i].vybrany.Prev != null)
                     {
                         hands[i].vybrany = hands[i].vybrany.Prev;
-                        Destroy(hands[i].vybrany.Prev.gameObject);
+                        Destroy(hands[i].vybrany.Next.gameObject);
                     }
                     Destroy(hands[i].vybrany.gameObject);
                 }
@@ -502,8 +504,14 @@ public class Hand_Ctrl : MonoBehaviour
                     while (hands[i].selected.Prev != null)
                     {
                         hands[i].selected = hands[i].selected.Prev;
-                        Destroy(hands[i].selected.Prev.gameObject);
+                        Destroy(hands[i].selected.Next.klic);
+                        Destroy(hands[i].selected.Next.end);
+                        Destroy(hands[i].selected.Next.pred);
+                        Destroy(hands[i].selected.Next.gameObject);
                     }
+                    Destroy(hands[i].selected.klic);
+                    Destroy(hands[i].selected.end);
+                    Destroy(hands[i].selected.pred);
                     Destroy(hands[i].selected.gameObject);
                 }
 
@@ -513,7 +521,7 @@ public class Hand_Ctrl : MonoBehaviour
                     while (hands[i].vybrany.Prev != null)
                     {
                         hands[i].vybrany = hands[i].vybrany.Prev;
-                        Destroy(hands[i].vybrany.Prev.gameObject);
+                        Destroy(hands[i].vybrany.Next.gameObject);
                     }
                     Destroy(hands[i].vybrany.gameObject);
                 }
@@ -532,20 +540,19 @@ public class Hand_Ctrl : MonoBehaviour
             hands[i].id = i;
             Add_line(hands[i]);
             Add_Nota(hands[i]);
-            hands[i].Prvni.gameObject.transform.position = proto_nota.transform.position;
         }
     }
 
     void Add_line(Holder hold)
     {
         GameObject novy = Instantiate(proto_linka, paper.transform, false);
-        novy.gameObject.name = "linka " + linek;
+        novy.gameObject.name = "linka " + hold.linek + " " + hold.id;
         novy.SetActive(true);
         GameObject klic = Instantiate(proto_klic, paper.transform, false);
-        klic.gameObject.name = "klic " + linek;
+        klic.gameObject.name = "klic " + hold.linek + " " + hold.id;
         klic.SetActive(true);
         GameObject end = Instantiate(proto_end, paper.transform, false);
-        end.gameObject.name = "end " + linek;
+        end.gameObject.name = "end " + hold.linek + " " + hold.id;
         end.SetActive(true);
         GameObject pred;
         if (hold.klic == 1)
@@ -557,15 +564,20 @@ public class Hand_Ctrl : MonoBehaviour
             pred = Instantiate(proto_pred_b, paper.transform, false);
         }
         pred.GetComponent<Predznamenani>().Activate(predznamenani);
-        pred.gameObject.name = "pred " + linek;
+        pred.gameObject.name = "pred " + hold.linek + " " + hold.id;
         pred.SetActive(true);
-        novy.transform.position = novy.transform.position + new Vector3(0, linek * vyska_linek, 0);
-        klic.transform.position = klic.transform.position + new Vector3(0, linek * vyska_linek, 0);
-        end.transform.position = end.transform.position + new Vector3(0, linek * vyska_linek, 0);
-        pred.transform.position = pred.transform.position + new Vector3(0, linek * vyska_linek, 0);
-        linek++;
+        int mod = 0;
+        if (hold.id > 0)
+        {
+            mod = hold.id + hold.linek;
+        }
+        novy.transform.position = novy.transform.position + new Vector3(0, mod * vyska_linek, 0);
+        klic.transform.position = klic.transform.position + new Vector3(0, mod * vyska_linek, 0);
+        end.transform.position = end.transform.position + new Vector3(0, mod * vyska_linek, 0);
+        pred.transform.position = pred.transform.position + new Vector3(0, mod * vyska_linek, 0);
         Line_Ctrl target = hold.last;
         Line_Ctrl LC = novy.GetComponent<Line_Ctrl>();
+        LC.id = hold.linek;
         LC.klic = klic;
         LC.end = end;
         LC.pred = pred;
@@ -580,6 +592,7 @@ public class Hand_Ctrl : MonoBehaviour
             hold.last = LC;
             hold.first = LC;
         }
+        hold.linek++;
     }
 
     void Start()
@@ -609,19 +622,90 @@ public class Hand_Ctrl : MonoBehaviour
     {
         return hands[selected_hand].vybrany;
     }
+
+    public void Do_Takty(Holder hold)
+    {
+        if (hold.Posledni.Pos_y > hold.last_x)
+        {
+            while (hold.last.id * 6 < hold.last_x)
+            {
+                Add_line(hold);
+            }
+            for (int i = (int)Math.Ceiling(hold.last_x); i < hold.Posledni.Pos_x; i++)
+            {
+                if (i%6 != 0)
+                {
+                    if (hold.selected.takty[i % 6] != null)
+                    {
+                        hold.selected.takty[i % 6].SetActive(true);
+                    }
+                    else
+                    {
+                        hold.selected.takty[i % 6] = Instantiate(proto_takt, hold.selected.transform, false); 
+                    }
+                }
+                else
+                {
+                    if (i != 0)
+                    {
+                        hold.selected = hold.selected.Next;
+                    }
+                }
+            }
+        }
+        else
+        {
+            hold.selected = hold.last;
+            while ((hold.selected.id - 1) * 6 < hold.last_x)
+            {
+                hold.selected.SetActive(false);
+                hold.selected = hold.selected.Prev;
+            }
+            for (int i = (int)Math.Ceiling(hold.Posledni.Pos_x); i < hold.last_x; i++)
+            {
+                if (i % 6 != 0)
+                {
+                    if (hold.selected.takty[i % 6] != null)
+                    {
+                        hold.selected.takty[i % 6].SetActive(true);
+                    }
+                    else
+                    {
+                        hold.selected.takty[i % 6] = Instantiate(proto_takt, hold.selected.transform, false);
+                    }
+                }
+                else
+                {
+                    if (i == 0)
+                    {
+                        hold.selected = hold.first;
+                    }
+                    else
+                    {
+                        hold.selected = hold.selected.Next;
+                    }
+                }
+            }
+        }
+        hold.last_x = hold.Posledni.Pos_y;
+    }
 }
 
 public class Holder
 {
     public int id;
+    public int not = 0;
+    public int linek = 0;
+
     public Znak vybrany;
     public Znak Prvni;
     public Znak Posledni;
 
-    public Line_Ctrl selected;
+    public Line_Ctrl selected; // hold last active
     public Line_Ctrl first;
     public Line_Ctrl last;
 
+    public float last_x = 0;
     public int klic = 1;//(1 = houslovy, 0 = bassovy)
 }
 

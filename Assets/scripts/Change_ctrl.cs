@@ -175,7 +175,7 @@ public class Change_ctrl : MonoBehaviour
         
     }
 
-    int Double_to_int(double input)
+    public static int Double_to_int(double input)
     {
         int output = 0;
         int mod = 1;

@@ -10,8 +10,8 @@ public class Znak : MonoBehaviour
     public static Hand_Ctrl CTRL;
     public static Vector3 ref_point;
 
-    public const int notes_per_line = 16;
-    public const float takt_width = 26.4f;
+    public const int takts_per_line = 6;
+    public const float takt_width = 79.2f;
     public const float nota_height = 3.7f;
 
     protected int delka = 0; // exponent 2 vzdy zaporne (2 na -2 je 1/4, atd.)
@@ -27,7 +27,20 @@ public class Znak : MonoBehaviour
 
     public Znak Prev { get => prev; set => prev = value; }
     public Znak Next { get => next; set => next = value; }
-    public float Pos_x { get => pos_x; set => pos_x = value; }
+
+    public float Pos_x
+    {
+        get
+        {
+            return pos_x;
+        }
+        set
+        {
+            pos_x = value;
+            CTRL.Do_Takty(master);
+        }
+    }
+
     public int Pos_y { get => pos_y; set => pos_y = value; }
     public virtual int Postfix { get { return 0; } set { } }
 
@@ -50,16 +63,16 @@ public class Znak : MonoBehaviour
         {
             mod = hand_id - 1 + pos_y;
         }
-        gameObject.transform.position = ref_point + new Vector3((pos_x * takt_width), (pos_y + mod) * Hand_Ctrl.vyska_linek, 0);
+        gameObject.transform.position = ref_point + new Vector3((Pos_x * takt_width), (pos_y + mod) * Hand_Ctrl.vyska_linek, 0);
     }
 
     public void Swap_Pos(Znak target)
     {
-        float tmp_x = target.pos_x;
+        float tmp_x = target.Pos_x;
         int tmp_y = target.pos_y;
-        target.pos_x = pos_x;
+        target.Pos_x = Pos_x;
         target.pos_y = pos_y;
-        pos_x = tmp_x;
+        Pos_x = tmp_x;
         pos_y = tmp_y;
         Calc_Pos();
         target.Calc_Pos();
@@ -86,7 +99,7 @@ public class Znak : MonoBehaviour
         delka = delka + 1;
         if (delka > 0)
         {
-
+            Do_lig();
         }
         else if(delka < -4)
         {
@@ -153,25 +166,25 @@ public class Znak : MonoBehaviour
         }
         master = target.master;
         hand_id = target.hand_id;
-        pos_x = target.pos_x;
+        Pos_x = target.Pos_x;
         pos_y = target.pos_y;
     }
 
     public void Transfer_pos(Znak target)
     {
-        pos_x = target.pos_x;
+        Pos_x = target.Pos_x;
         pos_y = target.pos_y;
     }
 
     public bool Bump_pos()
     { 
         bool output = false;
-        float mod = 2^prev.delka;
-        mod = mod + 0.5f * prev.Postfix;
-        pos_x = prev.pos_x + mod;
-        if (pos_x > notes_per_line)
+        double mod = Math.Pow(2, prev.delka);
+        mod = mod + 0.5 * prev.Postfix;
+        Pos_x = prev.Pos_x + (float)mod;
+        if (Pos_x > takts_per_line)
         {
-            pos_x = 0;
+            Pos_x = 0;
             pos_y++;
             output = true;
         }
@@ -230,7 +243,12 @@ public class Nota : Znak
             Transfer_pos(prev);
             Bump_pos();
         }
-        gameObject.transform.position = ref_point + new Vector3(pos_x * takt_width, pos_y * Hand_Ctrl.vyska_linek + vyska * nota_height, 0);
+        int mod = 0;
+        if (hand_id > 0)
+        {
+            mod = hand_id - 1 + pos_y;
+        }
+        gameObject.transform.position = ref_point + new Vector3(Pos_x * takt_width, (pos_y + mod) * Hand_Ctrl.vyska_linek + vyska * nota_height, 0);
         //prevraceni
         if (vyska > 1)
         {
