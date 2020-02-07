@@ -13,7 +13,7 @@ public class Nota_ProtoType : MonoBehaviour
 
     public GameObject prefix_GO;
     public GameObject topfix_GO;
-    public GameObject postfix_GO;
+    public GameObject[] postfix_GO;
 
     public GameObject carka_licha;
     public GameObject carka_suda;
@@ -354,13 +354,17 @@ public class Nota_ProtoType : MonoBehaviour
             topfix_GO.SetActive(false);
         }
         //postfix
-        if (postfix != 0)
+        for (int i = 0; i < postfix_GO.GetLength(0); i++)
         {
-            postfix_GO.SetActive(true);
-        }
-        else
-        {
-            postfix_GO.SetActive(false);
+            if (postfix > i)
+            {
+                postfix_GO[i].SetActive(true);
+
+            }
+            else
+            {
+                postfix_GO[i].SetActive(false);
+            }
         }
     }
 

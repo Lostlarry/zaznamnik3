@@ -19,7 +19,7 @@ public class Line_Ctrl : MonoBehaviour
 
     void Start()
     {
-        takty = new GameObject[Znak.takts_per_line - 1];
+        takty = new GameObject[Znak.takts_per_line];
     }
     void Update() { }
 
@@ -31,7 +31,10 @@ public class Line_Ctrl : MonoBehaviour
         gameObject.SetActive(state);
         for (int i = 0; i < takty.GetLength(0); i++)
         {
-            takty[i].SetActive(state);
+            if (takty[i] != null)
+            {
+                takty[i].SetActive(state); 
+            }
         }
     }
 }

@@ -163,7 +163,7 @@ public class Hand_Ctrl : MonoBehaviour
         return this;
     }
 
-    Nota Add_Nota(Holder hand, Znak target = null)
+    public Nota Add_Nota(Holder hand, Znak target = null)
     {
         if (hand == null)
         {
@@ -192,7 +192,7 @@ public class Hand_Ctrl : MonoBehaviour
             }
             else
             {
-                made.master.Posledni = made;
+                hand.Posledni = made;
             }
             target.Next = made;
             made.Prev = target;
@@ -201,8 +201,8 @@ public class Hand_Ctrl : MonoBehaviour
         }
         else
         {
-            made.master.Prvni = made;
-            made.master.Posledni = made;
+            hand.Prvni = made;
+            hand.Posledni = made;
             made.Calc_Pos();
         }
         hand.vybrany = made;
@@ -211,7 +211,7 @@ public class Hand_Ctrl : MonoBehaviour
         return made;
     }
 
-    Pomlka Add_Pomlka(Holder hand, Znak target = null)
+    public Pomlka Add_Pomlka(Holder hand, Znak target = null)
     {
         if (hand == null)
         {
@@ -239,7 +239,7 @@ public class Hand_Ctrl : MonoBehaviour
             }
             else
             {
-                made.master.Posledni = made;
+                hand.Posledni = made;
             }
             target.Next = made;
             made.Prev = target;
@@ -248,8 +248,8 @@ public class Hand_Ctrl : MonoBehaviour
         }
         else
         {
-            made.master.Prvni = made;
-            made.master.Posledni = made;
+            hand.Prvni = made;
+            hand.Posledni = made;
             made.Calc_Pos();
         }
         hand.vybrany = made;
@@ -462,19 +462,19 @@ public class Hand_Ctrl : MonoBehaviour
             {
                 if (hands[i].last != null)
                 {
-                    hands[i].selected = hands[i].last;
-                    while (hands[i].selected.Prev != null)
+                    Line_Ctrl LC_select = hands[i].last;
+                    while (LC_select.Prev != null)
                     {
-                        hands[i].selected = hands[i].selected.Prev;
-                        Destroy(hands[i].selected.Next.klic);
-                        Destroy(hands[i].selected.Next.end);
-                        Destroy(hands[i].selected.Next.pred);
-                        Destroy(hands[i].selected.Next.gameObject);
+                        LC_select = LC_select.Prev;
+                        Destroy(LC_select.Next.klic);
+                        Destroy(LC_select.Next.end);
+                        Destroy(LC_select.Next.pred);
+                        Destroy(LC_select.Next.gameObject);
                     }
-                    Destroy(hands[i].selected.klic);
-                    Destroy(hands[i].selected.end);
-                    Destroy(hands[i].selected.pred);
-                    Destroy(hands[i].selected.gameObject);
+                    Destroy(LC_select.klic);
+                    Destroy(LC_select.end);
+                    Destroy(LC_select.pred);
+                    Destroy(LC_select.gameObject);
                 }
 
                 if (hands[i].Posledni != null)
@@ -500,19 +500,19 @@ public class Hand_Ctrl : MonoBehaviour
             {
                 if (hands[i].last != null)
                 {
-                    hands[i].selected = hands[i].last;
-                    while (hands[i].selected.Prev != null)
+                    Line_Ctrl LC_select = hands[i].last;
+                    while (LC_select.Prev != null)
                     {
-                        hands[i].selected = hands[i].selected.Prev;
-                        Destroy(hands[i].selected.Next.klic);
-                        Destroy(hands[i].selected.Next.end);
-                        Destroy(hands[i].selected.Next.pred);
-                        Destroy(hands[i].selected.Next.gameObject);
+                        LC_select = LC_select.Prev;
+                        Destroy(LC_select.Next.klic);
+                        Destroy(LC_select.Next.end);
+                        Destroy(LC_select.Next.pred);
+                        Destroy(LC_select.Next.gameObject);
                     }
-                    Destroy(hands[i].selected.klic);
-                    Destroy(hands[i].selected.end);
-                    Destroy(hands[i].selected.pred);
-                    Destroy(hands[i].selected.gameObject);
+                    Destroy(LC_select.klic);
+                    Destroy(LC_select.end);
+                    Destroy(LC_select.pred);
+                    Destroy(LC_select.gameObject);
                 }
 
                 if (hands[i].Posledni != null)
@@ -547,13 +547,10 @@ public class Hand_Ctrl : MonoBehaviour
     {
         GameObject novy = Instantiate(proto_linka, paper.transform, false);
         novy.gameObject.name = "linka " + hold.linek + " " + hold.id;
-        novy.SetActive(true);
         GameObject klic = Instantiate(proto_klic, paper.transform, false);
         klic.gameObject.name = "klic " + hold.linek + " " + hold.id;
-        klic.SetActive(true);
         GameObject end = Instantiate(proto_end, paper.transform, false);
         end.gameObject.name = "end " + hold.linek + " " + hold.id;
-        end.SetActive(true);
         GameObject pred;
         if (hold.klic == 1)
         {
@@ -565,11 +562,10 @@ public class Hand_Ctrl : MonoBehaviour
         }
         pred.GetComponent<Predznamenani>().Activate(predznamenani);
         pred.gameObject.name = "pred " + hold.linek + " " + hold.id;
-        pred.SetActive(true);
-        int mod = 0;
-        if (hold.id > 0)
+        int mod = hold.linek;
+        if (hands.GetLength(0) > 1)
         {
-            mod = hold.id + hold.linek;
+            mod = hold.id + hold.linek * 2;
         }
         novy.transform.position = novy.transform.position + new Vector3(0, mod * vyska_linek, 0);
         klic.transform.position = klic.transform.position + new Vector3(0, mod * vyska_linek, 0);
@@ -581,6 +577,7 @@ public class Hand_Ctrl : MonoBehaviour
         LC.klic = klic;
         LC.end = end;
         LC.pred = pred;
+        LC.SetActive(true);
         if (target != null)
         {
             target.Next = LC;
@@ -591,6 +588,7 @@ public class Hand_Ctrl : MonoBehaviour
         {
             hold.last = LC;
             hold.first = LC;
+            hold.selected = LC;
         }
         hold.linek++;
     }
@@ -625,53 +623,57 @@ public class Hand_Ctrl : MonoBehaviour
 
     public void Do_Takty(Holder hold)
     {
-        if (hold.Posledni.Pos_y > hold.last_x)
+        int mod = Znak.takts_per_line + 1;
+        if (hold.Posledni.Dist_x > hold.last_x)
         {
-            while (hold.last.id * 6 < hold.last_x)
+            for (int i = (int)Math.Floor(hold.last_x)+ 1; i < (int)Math.Floor(hold.Posledni.Dist_x) + 1; i++)
             {
-                Add_line(hold);
-            }
-            for (int i = (int)Math.Ceiling(hold.last_x); i < hold.Posledni.Pos_x; i++)
-            {
-                if (i%6 != 0)
+                Debug.Log(hold.selected);
+                int modulo = i % mod;
+                if (modulo != 0)
                 {
-                    if (hold.selected.takty[i % 6] != null)
+                    Debug.Log(hold.selected);
+                    if (hold.selected.takty[(modulo) - 1] != null)
                     {
-                        hold.selected.takty[i % 6].SetActive(true);
+                        hold.selected.takty[(modulo) - 1].SetActive(true);
                     }
                     else
                     {
-                        hold.selected.takty[i % 6] = Instantiate(proto_takt, hold.selected.transform, false); 
+                        hold.selected.takty[(modulo) - 1] = Instantiate(proto_takt, hold.selected.transform, false);
+                        hold.selected.takty[(modulo) - 1].SetActive(true);
+                        hold.selected.takty[(modulo) - 1].transform.position = hold.selected.end.transform.position + new Vector3(-(6 - modulo) * Znak.takt_width, 0);
                     }
                 }
                 else
                 {
                     if (i != 0)
                     {
+                        Debug.Log(hold.selected.Next);
+                        Line_Ctrl LC_select = hold.first;
+                        for (int x = 0; x < hold.Posledni.Pos_y; x++)
+                        {
+                            if (LC_select.Next == null)
+                            {
+                                Add_line(hold);
+                            }
+                            LC_select = LC_select.Next;
+                        }
                         hold.selected = hold.selected.Next;
+                        Debug.Log(hold.selected);
                     }
                 }
             }
         }
         else
         {
-            hold.selected = hold.last;
-            while ((hold.selected.id - 1) * 6 < hold.last_x)
+            for (int i = (int)Math.Floor(hold.last_x); i > (int)Math.Floor(hold.Posledni.Dist_x) -1; i--)
             {
-                hold.selected.SetActive(false);
-                hold.selected = hold.selected.Prev;
-            }
-            for (int i = (int)Math.Ceiling(hold.Posledni.Pos_x); i < hold.last_x; i++)
-            {
-                if (i % 6 != 0)
+                int modulo = i % mod;
+                if (i % modulo != 0)
                 {
-                    if (hold.selected.takty[i % 6] != null)
+                    if (hold.selected.takty[(i % modulo) - 1] != null)
                     {
-                        hold.selected.takty[i % 6].SetActive(true);
-                    }
-                    else
-                    {
-                        hold.selected.takty[i % 6] = Instantiate(proto_takt, hold.selected.transform, false);
+                        hold.selected.takty[i % modulo - 1].SetActive(false);
                     }
                 }
                 else
@@ -682,12 +684,13 @@ public class Hand_Ctrl : MonoBehaviour
                     }
                     else
                     {
-                        hold.selected = hold.selected.Next;
+                        hold.selected.SetActive(false);
+                        hold.selected = hold.selected.Prev;
                     }
                 }
             }
         }
-        hold.last_x = hold.Posledni.Pos_y;
+        hold.last_x = hold.Posledni.Dist_x;
     }
 }
 
@@ -707,5 +710,6 @@ public class Holder
 
     public float last_x = 0;
     public int klic = 1;//(1 = houslovy, 0 = bassovy)
+    
 }
 
