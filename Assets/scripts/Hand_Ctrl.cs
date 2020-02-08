@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Hand_Ctrl : MonoBehaviour
 {
@@ -9,6 +10,8 @@ public class Hand_Ctrl : MonoBehaviour
     public HUD_ctrl Select_HUD;
     public HUD_ctrl End_HUD;
     public GameObject paper;
+    public GameObject tatk_top;
+    public GameObject tatk_bot;
 
     public GameObject proto_nota;
     public GameObject proto_linka;
@@ -23,7 +26,7 @@ public class Hand_Ctrl : MonoBehaviour
     int selected_hand = 0;
 
     public int predznamenani = 0; //0 = cdur kladny jsou krizky, zaporny jsou becka
-    public int takt = 1;
+    public int takt = 16;
 
     public override string ToString()
     {
@@ -34,6 +37,7 @@ public class Hand_Ctrl : MonoBehaviour
             while (hands[i].vybrany != null)
             {
                 dat = dat + hands[i].vybrany.ToString();
+                hands[i].vybrany = hands[i].vybrany.Next;
             }
             dat = "H," + hands[i].klic + ";" + dat; 
         }
@@ -43,7 +47,7 @@ public class Hand_Ctrl : MonoBehaviour
         return dat;
     }
 
-    public Hand_Ctrl Give_data(string input, out bool[] errors)
+    public void From_string(string input, out bool[] errors)
     {
         //hands count not loaded * hands count invalid * no hands loaded * invalid string * N/P when no hand tag * invalid datatype * subtype destring error * more hands then hand count * less hands then hand count
         errors = new bool[9] {false, false, false, false, false, false, false, false, false};
@@ -160,35 +164,45 @@ public class Hand_Ctrl : MonoBehaviour
         {
             errors[0] = true;
         }
-        return this;
+        int tmp = takt / 2;
+        if (tmp % 2 == 0)
+        {
+            tatk_bot.GetComponent<Text>().text = "4";
+            tatk_top.GetComponent<Text>().text = (tmp / 2).ToString();
+        }
+        else
+        {
+            tatk_bot.GetComponent<Text>().text = "8";
+            tatk_top.GetComponent<Text>().text = tmp.ToString();
+        }
     }
 
-    public Nota Add_Nota(Holder hand, Znak target = null, int input_delka = -1)
+    public Nota Add_Nota(Holder hold, Znak target = null, int input_delka = -1)
     {
-        if (hand == null)
+        if (hold == null)
         {
-            hand = hands[0];
+            hold = hands[0];
         }
         bool middle = true;
         if (target == null)
         {
-            target = hand.Posledni;
+            target = hold.Posledni;
             middle = false;
         }
         GameObject GO = Instantiate(proto_nota, paper.transform, false);
-        GO.name = "nota " + hand.not + " " + hand.id;
+        GO.name = "nota " + hold.not + " " + hold.id;
         GO.SetActive(true);
-        hand.not++;
+        hold.not++;
         Nota made = GO.AddComponent<Nota>();
         made.Do_data();
-        made.master = hand;
-        made.Hand_id = hands.GetLength(0) - 1 + hand.id;
+        made.master = hold;
+        made.Hand_id = hands.GetLength(0) - 1 + hold.id;
         if (input_delka == -1)
         {
             int tmp_delka = 1;
             for (int i = 4; i > -1; i--)
             {
-                if (Math.Pow(2, i) <= Znak.takt_delka)
+                if (Math.Pow(2, i) <= takt)
                 {
                     tmp_delka = i;
                     i = -1;
@@ -209,7 +223,7 @@ public class Hand_Ctrl : MonoBehaviour
             }
             else
             {
-                hand.Posledni = made;
+                hold.Posledni = made;
             }
             target.Next = made;
             made.Prev = target;
@@ -217,41 +231,45 @@ public class Hand_Ctrl : MonoBehaviour
         }
         else
         {
-            hand.Prvni = made;
-            hand.Posledni = made;
+            hold.Prvni = made;
+            hold.Posledni = made;
+            made.linka = hold.first;
             made.Calc_Pos();
         }
-        hand.vybrany = made;
-        Select_hand(hand);
+
+         
+        made.Update_delka();
+        hold.vybrany = made;
+        Select_hand(hold);
         Select_HUD.Adjust_HUD(made);
         return made;
     }
 
-    public Pomlka Add_Pomlka(Holder hand, Znak target = null, int input_delka = -1)
+    public Pomlka Add_Pomlka(Holder hold, Znak target = null, int input_delka = -1)
     {
-        if (hand == null)
+        if (hold == null)
         {
-            hand = hands[0];
+            hold = hands[0];
         }
         bool middle = true;
         if (target == null)
         {
-            target = hand.Posledni;
+            target = hold.Posledni;
             middle = false;
         }
         GameObject GO = Instantiate(proto_nota, paper.transform, false);
-        GO.name = "note " + hand.not + " " + hand.id;
-        hand.not++;
+        GO.name = "note " + hold.not + " " + hold.id;
+        hold.not++;
         Pomlka made = GO.AddComponent<Pomlka>();
         made.Do_data();
-        made.master = hand;
-        made.Hand_id = hands.GetLength(0) - 1 + hand.id;
+        made.master = hold;
+        made.Hand_id = hands.GetLength(0) - 1 + hold.id;
         if (input_delka == -1)
         {
             int tmp_delka = 1;
             for (int i = 4; i > -1; i--)
             {
-                if (Math.Pow(2, i) <= Znak.takt_delka)
+                if (Math.Pow(2, i) <= takt)
                 {
                     tmp_delka = i;
                     i = -1;
@@ -272,7 +290,7 @@ public class Hand_Ctrl : MonoBehaviour
             }
             else
             {
-                hand.Posledni = made;
+                hold.Posledni = made;
             }
             target.Next = made;
             made.Prev = target;
@@ -280,13 +298,15 @@ public class Hand_Ctrl : MonoBehaviour
         }
         else
         {
-            hand.Prvni = made;
-            hand.Posledni = made;
+            hold.Prvni = made;
+            hold.Posledni = made;
+            made.linka = hold.first;
             made.Calc_Pos();
         }
-        hand.vybrany = made;
+        made.Update_delka();
+        hold.vybrany = made;
         Select_HUD.Adjust_HUD(made);
-        Select_hand(hand);
+        Select_hand(hold);
         return made;
     }
 
@@ -486,7 +506,7 @@ public class Hand_Ctrl : MonoBehaviour
     {
         Select_hand(0);
         predznamenani = 0;
-        takt = 1;
+        takt = 16;
 
         if (hands != null)
         {
@@ -498,15 +518,9 @@ public class Hand_Ctrl : MonoBehaviour
                     while (LC_select.Prev != null)
                     {
                         LC_select = LC_select.Prev;
-                        Destroy(LC_select.Next.klic);
-                        Destroy(LC_select.Next.end);
-                        Destroy(LC_select.Next.pred);
-                        Destroy(LC_select.Next.gameObject);
+                        LC_select.Prev.prep_Destroy();
                     }
-                    Destroy(LC_select.klic);
-                    Destroy(LC_select.end);
-                    Destroy(LC_select.pred);
-                    Destroy(LC_select.gameObject);
+                    LC_select.prep_Destroy();
                 }
 
                 if (hands[i].Posledni != null)
@@ -536,15 +550,9 @@ public class Hand_Ctrl : MonoBehaviour
                     while (LC_select.Prev != null)
                     {
                         LC_select = LC_select.Prev;
-                        Destroy(LC_select.Next.klic);
-                        Destroy(LC_select.Next.end);
-                        Destroy(LC_select.Next.pred);
-                        Destroy(LC_select.Next.gameObject);
+                        LC_select.Prev.prep_Destroy();
                     }
-                    Destroy(LC_select.klic);
-                    Destroy(LC_select.end);
-                    Destroy(LC_select.pred);
-                    Destroy(LC_select.gameObject);
+                    LC_select.prep_Destroy();
                 }
 
                 if (hands[i].Posledni != null)
@@ -571,12 +579,31 @@ public class Hand_Ctrl : MonoBehaviour
             hands[i] = new Holder();
             hands[i].id = i;
             Add_line(hands[i]);
-            Add_Nota(hands[i]);
+            Add_takt(hands[i], Add_Nota(hands[i]));
+        }
+         
+        int tmp = takt / 2;
+        if (tmp % 2 == 0)
+        {
+            tatk_bot.GetComponent<Text>().text = "4";
+            tatk_top.GetComponent<Text>().text = (tmp / 2).ToString();
+        }
+        else
+        {
+            tatk_bot.GetComponent<Text>().text = "8";
+            tatk_top.GetComponent<Text>().text = tmp.ToString();
         }
     }
 
-    void Add_line(Holder hold)
+    public void Add_line(Holder hold)
     {
+        if (hold.selected != null)
+        {
+            if (hold.selected.Next != null)
+            {
+                return;
+            }
+        }
         GameObject novy = Instantiate(proto_linka, paper.transform, false);
         novy.gameObject.name = "linka " + hold.linek + " " + hold.id;
         GameObject klic = Instantiate(proto_klic, paper.transform, false);
@@ -605,6 +632,7 @@ public class Hand_Ctrl : MonoBehaviour
         pred.transform.position = pred.transform.position + new Vector3(0, mod * vyska_linek, 0);
         Line_Ctrl target = hold.last;
         Line_Ctrl LC = novy.GetComponent<Line_Ctrl>();
+        LC.master = hold;
         LC.id = hold.linek;
         LC.klic = klic;
         LC.end = end;
@@ -643,6 +671,7 @@ public class Hand_Ctrl : MonoBehaviour
                 target.Update_delka();
                 target = target.Next;
             }
+            Select_HUD.Adjust_HUD(hold.Posledni);
             End_HUD.Adjust_HUD(hold.Posledni);
         }
         
@@ -655,71 +684,48 @@ public class Hand_Ctrl : MonoBehaviour
 
     public void Do_Takty(Holder hold)
     {
-        int mod = Znak.takts_per_line + 1;
-        float Dist_t = hold.Posledni.Dist_x / Znak.takt_delka;  // vzdalenost od prevni noty v taktech
-        if (Dist_t > hold.last_x)
+        if (hold.pocatek != null)
         {
-            for (int i = (int)Math.Floor(hold.last_x)+ 1; i < (int)Math.Floor(Dist_t) + 1; i++)
+
+             
+            hold.pocatek.recalc(hold.Prvni);
+            hold.first.count(hold.pocatek); 
+        }
+    }
+    
+    public Takt Add_takt(Holder hold, Znak targ)
+    {
+        Takt made;
+        if (hold.nakonec == null)
+        {
+            made = new Takt(Instantiate(proto_takt, hold.first.transform, false), targ, null, hold.last);
+            hold.nakonec = made;
+            hold.pocatek = made;
+        }
+        else
+        {
+            made = new Takt(Instantiate(proto_takt, hold.first.transform, false), targ, hold.nakonec, hold.last);
+            hold.nakonec = made;
+        }
+        return made;
+    }
+
+    public Line_Ctrl get_linka(Holder hold, int input)
+    {
+        Line_Ctrl selected = hold.first;
+        while (selected != null)
+        {
+            if (selected.id == input)
             {
-                int modulo = i % mod;
-                if (modulo != 0)
-                {
-                    if (hold.selected.takty[(modulo) - 1] != null)
-                    {
-                        hold.selected.takty[(modulo) - 1].SetActive(true);
-                    }
-                    else
-                    {
-                        hold.selected.takty[(modulo) - 1] = Instantiate(proto_takt, hold.selected.transform, false);
-                        hold.selected.takty[(modulo) - 1].SetActive(true);
-                        hold.selected.takty[(modulo) - 1].transform.position = hold.selected.end.transform.position + new Vector3(-(6 - modulo) * Znak.takt_width, 0);
-                    }
-                }
-                else
-                {
-                    if (i != 0)
-                    {
-                        Line_Ctrl LC_select = hold.first;
-                        for (int x = 0; x < hold.Posledni.Pos_y; x++)
-                        {
-                            if (LC_select.Next == null)
-                            {
-                                Add_line(hold);
-                            }
-                            LC_select = LC_select.Next;
-                        }
-                        hold.selected = hold.selected.Next;
-                    }
-                }
+                return selected;
+            }
+            else
+            {
+                selected = selected.Next;
             }
         }
-        else if (Dist_t < hold.last_x)
-        {
-            for (int i = (int)Math.Floor(hold.last_x); i > (int)Math.Floor(Dist_t) -1; i--)
-            {
-                int modulo = i % mod;
-                if (modulo != 0)
-                {
-                    if (hold.selected.takty[(modulo) - 1] != null)
-                    {
-                        hold.selected.takty[modulo - 1].SetActive(false);
-                    }
-                }
-                else
-                {
-                    if (i == 0)
-                    {
-                        hold.selected = hold.first;
-                    }
-                    else
-                    {
-                        hold.selected.SetActive(false);
-                        hold.selected = hold.selected.Prev;
-                    }
-                }
-            }
-        }
-        hold.last_x = Dist_t;
+        Debug.Log("FOUND NO LINKA OF GIVEN ID");
+        return null;
     }
 }
 
@@ -736,6 +742,9 @@ public class Holder
     public Line_Ctrl selected; // hold last active
     public Line_Ctrl first;
     public Line_Ctrl last;
+
+    public Takt pocatek;
+    public Takt nakonec;
 
     public float last_x = 0;
     public int klic = 1;//(1 = houslovy, 0 = bassovy)

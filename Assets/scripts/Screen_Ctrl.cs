@@ -41,18 +41,21 @@ public class Screen_Ctrl : MonoBehaviour
                 break;
             case 13://loading from file
                 Hand_Ctrl original = gameObject.GetComponent<Hand_Ctrl>();
-                Hand_Ctrl temp = gameObject.AddComponent<Hand_Ctrl>().Give_data(saver.getString(), out bool[] errors);
+                Hand_Ctrl temp = gameObject.AddComponent<Hand_Ctrl>();
+                temp.From_string(saver.getString(), out bool[] errors);//note to  self DOTN DO THIS IT BAD
                 errors = Log_Error(errors);
                 if (!errors[0])//it didnt actualy load
                 {
                     temp.transform.SetParent(gameObject.transform);
-                    Destroy(original);
+                    original.From_string(saver.getString(), out errors);
+                    Destroy(temp);
                     current = workplace;
                 }
                 if (errors[1])
                 {
                     Znak.CTRL = original;
                     Errorlog.transform.SetParent(current.transform);
+                    Destroy(temp);
                     Errorlog.SetActive(true);
                 }
                 current.SetActive(true);
