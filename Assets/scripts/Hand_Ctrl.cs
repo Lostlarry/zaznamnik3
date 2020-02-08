@@ -163,7 +163,7 @@ public class Hand_Ctrl : MonoBehaviour
         return this;
     }
 
-    public Nota Add_Nota(Holder hand, Znak target = null)
+    public Nota Add_Nota(Holder hand, Znak target = null, int input_delka = -1)
     {
         if (hand == null)
         {
@@ -183,12 +183,29 @@ public class Hand_Ctrl : MonoBehaviour
         made.Do_data();
         made.master = hand;
         made.Hand_id = hands.GetLength(0) - 1 + hand.id;
+        if (input_delka == -1)
+        {
+            int tmp_delka = 1;
+            for (int i = 4; i > -1; i--)
+            {
+                if (Math.Pow(2, i) <= Znak.takt_delka)
+                {
+                    tmp_delka = i;
+                    i = -1;
+                }
+            }
+            made.Delka = tmp_delka;
+        }
+        else
+        {
+            made.Delka = input_delka;
+        }
         if (target != null)
         {
             if (middle && target.Next != null)
             {
                 made.Next = target.Next;
-                Recalc(made.Next, true);
+                Recalc(made.Next);
             }
             else
             {
@@ -196,7 +213,6 @@ public class Hand_Ctrl : MonoBehaviour
             }
             target.Next = made;
             made.Prev = target;
-            made.Transfer_pos(target);
             made.Bump_pos();
         }
         else
@@ -211,7 +227,7 @@ public class Hand_Ctrl : MonoBehaviour
         return made;
     }
 
-    public Pomlka Add_Pomlka(Holder hand, Znak target = null)
+    public Pomlka Add_Pomlka(Holder hand, Znak target = null, int input_delka = -1)
     {
         if (hand == null)
         {
@@ -230,12 +246,29 @@ public class Hand_Ctrl : MonoBehaviour
         made.Do_data();
         made.master = hand;
         made.Hand_id = hands.GetLength(0) - 1 + hand.id;
+        if (input_delka == -1)
+        {
+            int tmp_delka = 1;
+            for (int i = 4; i > -1; i--)
+            {
+                if (Math.Pow(2, i) <= Znak.takt_delka)
+                {
+                    tmp_delka = i;
+                    i = -1;
+                }
+            }
+            made.Delka = tmp_delka;
+        }
+        else
+        {
+            made.Delka = input_delka;
+        }
         if (target != null)
         {
             if (middle && target.Next != null)
             {
                 made.Next = target.Next;
-                Recalc(made.Next, true);
+                Recalc(made.Next);
             }
             else
             {
@@ -243,7 +276,6 @@ public class Hand_Ctrl : MonoBehaviour
             }
             target.Next = made;
             made.Prev = target;
-            made.Transfer_pos(target);
             made.Bump_pos();
         }
         else
@@ -600,20 +632,20 @@ public class Hand_Ctrl : MonoBehaviour
     }
     void Update(){}
 
-    public void Recalc(Znak target, bool force = false)
+    public void Recalc(Znak target)
     {
         if (target != null)
         {
-            while (target.Next != null)
+            Holder hold = target.master;
+            while (target != null)
             {
                 target.Calc_Pos(true);
+                target.Update_delka();
                 target = target.Next;
             }
-            if (target.Bump_pos())
-            {
-                Add_line(target.master);
-            } 
+            End_HUD.Adjust_HUD(hold.Posledni);
         }
+        
     }
 
     public Znak get_selected()
@@ -624,15 +656,14 @@ public class Hand_Ctrl : MonoBehaviour
     public void Do_Takty(Holder hold)
     {
         int mod = Znak.takts_per_line + 1;
-        if (hold.Posledni.Dist_x > hold.last_x)
+        float Dist_t = hold.Posledni.Dist_x / Znak.takt_delka;  // vzdalenost od prevni noty v taktech
+        if (Dist_t > hold.last_x)
         {
-            for (int i = (int)Math.Floor(hold.last_x)+ 1; i < (int)Math.Floor(hold.Posledni.Dist_x) + 1; i++)
+            for (int i = (int)Math.Floor(hold.last_x)+ 1; i < (int)Math.Floor(Dist_t) + 1; i++)
             {
-                Debug.Log(hold.selected);
                 int modulo = i % mod;
                 if (modulo != 0)
                 {
-                    Debug.Log(hold.selected);
                     if (hold.selected.takty[(modulo) - 1] != null)
                     {
                         hold.selected.takty[(modulo) - 1].SetActive(true);
@@ -648,7 +679,6 @@ public class Hand_Ctrl : MonoBehaviour
                 {
                     if (i != 0)
                     {
-                        Debug.Log(hold.selected.Next);
                         Line_Ctrl LC_select = hold.first;
                         for (int x = 0; x < hold.Posledni.Pos_y; x++)
                         {
@@ -659,21 +689,20 @@ public class Hand_Ctrl : MonoBehaviour
                             LC_select = LC_select.Next;
                         }
                         hold.selected = hold.selected.Next;
-                        Debug.Log(hold.selected);
                     }
                 }
             }
         }
-        else
+        else if (Dist_t < hold.last_x)
         {
-            for (int i = (int)Math.Floor(hold.last_x); i > (int)Math.Floor(hold.Posledni.Dist_x) -1; i--)
+            for (int i = (int)Math.Floor(hold.last_x); i > (int)Math.Floor(Dist_t) -1; i--)
             {
                 int modulo = i % mod;
-                if (i % modulo != 0)
+                if (modulo != 0)
                 {
-                    if (hold.selected.takty[(i % modulo) - 1] != null)
+                    if (hold.selected.takty[(modulo) - 1] != null)
                     {
-                        hold.selected.takty[i % modulo - 1].SetActive(false);
+                        hold.selected.takty[modulo - 1].SetActive(false);
                     }
                 }
                 else
@@ -690,7 +719,7 @@ public class Hand_Ctrl : MonoBehaviour
                 }
             }
         }
-        hold.last_x = hold.Posledni.Dist_x;
+        hold.last_x = Dist_t;
     }
 }
 

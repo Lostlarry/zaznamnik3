@@ -25,7 +25,7 @@ public class Nota_ProtoType : MonoBehaviour
 
     bool nota = true;
 
-    int delka = 0;
+    int delka = 4;
     int vyska = 0;
 
     int prefix = 0;
@@ -52,20 +52,20 @@ public class Nota_ProtoType : MonoBehaviour
         }
         set
         {
-            if (value > -5)
+            if (value > -1)
             {
-                if (value < 1)
+                if (value < 4)
                 {
                     delka = value;  
                 }
                 else
                 {
-                    delka = 0;
+                    delka = 4;
                 }
             }
             else
             {
-                delka = -4;
+                delka = 0;
             }
             Update_gfx();
         }
@@ -271,13 +271,13 @@ public class Nota_ProtoType : MonoBehaviour
                     break;
             }
             //delka not
-            if (delka < -1)
+            if (delka < 3)
             {
                 gameObject.GetComponent<Image>().sprite = Gfx.Nota_ctvrt;
-                if (delka < -2)
+                if (delka < 2)
                 {
                     prapor_GOs[0].SetActive(true);
-                    if (delka == -4)
+                    if (delka == 0)
                     {
                         prapor_GOs[1].SetActive(true);
                     }
@@ -294,7 +294,7 @@ public class Nota_ProtoType : MonoBehaviour
             }
             else
             {
-                if (delka == -1)
+                if (delka == 3)
                 {
                     gameObject.GetComponent<Image>().sprite = Gfx.Nota_pull;
                 }
@@ -324,19 +324,19 @@ public class Nota_ProtoType : MonoBehaviour
             //delka pomka
             switch (delka)
             {
-                case 0:
+                case 4:
                     gameObject.GetComponent<Image>().sprite = Gfx.P_cela;
                     break;
-                case -1:
+                case 3:
                     gameObject.GetComponent<Image>().sprite = Gfx.P_pull;
                     break;
-                case -2:
+                case 2:
                     gameObject.GetComponent<Image>().sprite = Gfx.P_ctvrt;
                     break;
-                case -3:
+                case 1:
                     gameObject.GetComponent<Image>().sprite = Gfx.P_osmina;
                     break;
-                case -4:
+                case 0:
                     gameObject.GetComponent<Image>().sprite = Gfx.P_sestnactina;
                     break;
                 default:

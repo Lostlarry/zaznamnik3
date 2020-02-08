@@ -12,11 +12,11 @@ public class Znak : MonoBehaviour
 
     public static int takts_per_line = 5;// nevissi id takze taktu je o jedna vic
     public static float takt_width = 79.2f;
-    public static float takt_delka = 1f;
+    public static float takt_delka = 16f;
     public const float nota_height = 3.7f;
 
-    private int delka = 0; // exponent 2 vzdy zaporne (2 na -2 je 1/4, atd.)
-    int postfix = 0;// 0 = nic 1 az 3 = mnozsti tecek delka s teckama = (delka * (2^-pocet tecek))
+    protected int delka = 4; // exponent 2 vzdy zaporne (2 na -2 je 1/4, atd.)
+    protected int postfix = 0;// 0 = nic 1 az 3 = mnozsti tecek delka s teckama = (delka * (2^-pocet tecek))
 
     public Holder master;
 
@@ -44,10 +44,6 @@ public class Znak : MonoBehaviour
                 pos_x = value;
                 CTRL.Do_Takty(master);
             }
-            else
-            {
-                pos_x = value;
-            }
         }
     }
 
@@ -56,7 +52,7 @@ public class Znak : MonoBehaviour
 
     public int Hand_id { get => hand_id; set => hand_id = value; }
     public float Dist_x { get => dist_x; set => dist_x = value; }
-    protected int Delka
+    public int Delka
     {
         get
         {
@@ -65,42 +61,48 @@ public class Znak : MonoBehaviour
         set
         {
             delka = value;
-            if (dist_x % 1 + Math.Pow(2, delka) * (2 - Math.Pow(2, -postfix)) > takt_delka)
+            Update_delka();
+            if (Delka < 0)
             {
-                Adapt(1 - dist_x % takt_delka);
-                Do_lig();
-            }
-            else if (Delka < -4)
-            {
-                Delka = -4;
+                Delka = 0;
             }
             Update_gfx();
         }
     }
 
+    public void Update_delka()
+    {
+        if ((dist_x % takt_delka + Math.Pow(2, delka) * (2 - Math.Pow(2, -postfix))) > takt_delka)
+        {
+            Adapt(takt_delka - dist_x % takt_delka);
+            Do_lig();
+        }
+    }
+
     public void Adapt(float input)
     {
+        Debug.Log(gameObject.name + " k " + input);
         float rem_input = input;
-        int tmp_delka = 1;
+        int tmp_delka = -1;
         int targ_post = 0;
-        for (int i = 0; i < 5; i++)
+        for (int i = 4; i > -1; i--)
         {
-            if (Math.Pow(2, -i) > input)
+            if (Math.Pow(2, i) < rem_input)
             {
-                if (tmp_delka > 0)
+                if (tmp_delka < 0)
                 {
-                    rem_input = rem_input - (float)Math.Pow(2, -i);
-                    tmp_delka = -i;
+                    rem_input = rem_input - (float)Math.Pow(2, i);
+                    tmp_delka = i;
                 }
                 else
                 {
-                    rem_input = rem_input - (float)Math.Pow(2, -i) * tmp_delka;
+                    rem_input = rem_input - (float)Math.Pow(2, i) * tmp_delka;
                     targ_post++;
                 }
             }
-            else if (tmp_delka < 0)
+            else if (tmp_delka > 0)
             {
-                i = 5;
+                i = 0;
             }
         }
         bool shifted = false;
@@ -108,11 +110,11 @@ public class Znak : MonoBehaviour
         {
             if (is_nota())
             {
-                CTRL.Add_Nota(master, this).Adapt(input);
+                CTRL.Add_Nota(master, this, 1).Adapt(rem_input);
             }
             else
             {
-                CTRL.Add_Pomlka(master, this).Adapt(input);
+                CTRL.Add_Pomlka(master, this, 1).Adapt(rem_input);
             }
             shifted = true;
         }
@@ -123,12 +125,13 @@ public class Znak : MonoBehaviour
         }
         if (is_nota())
         {
-            CTRL.Add_Nota(master, target).Adapt((float)(Math.Pow(2, delka) * (2 - Math.Pow(2, -postfix) - input)));
+            CTRL.Add_Nota(master, target, 1).Adapt((float)(Math.Pow(2, delka) * (2 - Math.Pow(2, -postfix)) - input));
         }
         else
         {
-            CTRL.Add_Pomlka(master, target).Adapt((float)(Math.Pow(2, delka) * (2 - Math.Pow(2, -postfix) - input)));
+            CTRL.Add_Pomlka(master, target, 1).Adapt((float)(Math.Pow(2, delka) * (2 - Math.Pow(2, -postfix)) - input));
         }
+        Debug.Log(gameObject.name + "asdwadw");
         delka = tmp_delka;
         postfix = targ_post;
         Update_gfx();
@@ -143,7 +146,6 @@ public class Znak : MonoBehaviour
     {
         if (update)
         {
-            Transfer_pos(prev);
             Bump_pos();
         }
         int mod = 0;
@@ -192,7 +194,7 @@ public class Znak : MonoBehaviour
 
     public virtual void Nota_Short(int i = 1)
     {
-        if (i > -4)// mensi nez sestnanctiny neberem
+        if (i > 0)// mensi nez sestnanctiny neberem
         {
             Delka = Delka - 1;
         }
@@ -231,7 +233,6 @@ public class Znak : MonoBehaviour
 
     protected virtual void Do_lig()
     {
-        Delka = 0;
     }
 
     public void Transfer(Znak target)
@@ -253,19 +254,12 @@ public class Znak : MonoBehaviour
         Pos_x = target.Pos_x;
     }
 
-    public void Transfer_pos(Znak target)
-    {
-        dist_x = target.dist_x;
-        pos_y = target.pos_y;
-        Pos_x = target.Pos_x;
-    }
-
     public bool Bump_pos()
     { 
         bool output = false;
         double mod = Math.Pow(2, prev.Delka) * (2 - Math.Pow(2, -prev.postfix));
         dist_x = prev.dist_x + (float)mod;
-        pos_x = prev.pos_x + (float)mod;
+        pos_x = prev.pos_x + (float)mod / takt_delka;
         if (Pos_x > takts_per_line)
         {
             pos_x = 0;
@@ -316,16 +310,12 @@ public class Nota : Znak
     int vyska = 0; // relativne ku spodni radce
 
     int prefix = 0;// 0= nic 1 = krizky 2 = becka 3 = cista 
-    int postfix = 0;// 0 = nic 1 az 3 = mnozsti tecek (delka * 1,5)
     int topfix = 0;// 0 = nic 1 
-
-    public override int Postfix { get => postfix; set => postfix = value; }
 
     public override void Calc_Pos(bool update = false)
     {
         if (update)
         {
-            Transfer_pos(prev);
             Bump_pos();
         }
         int mod = 0;
@@ -532,13 +522,13 @@ public class Nota : Znak
                 break;
         }
         //delka not
-        if (Delka < -1)
+        if (Delka < 3)
         {
             gameObject.GetComponent<Image>().sprite = Gfx.Nota_ctvrt;
-            if (Delka < -2)
+            if (Delka < 2)
             {
                 prapor_GOs[0].SetActive(true);
-                if (Delka == -4)
+                if (Delka == 1)
                 {
                     prapor_GOs[1].SetActive(true);
                 }
@@ -555,7 +545,7 @@ public class Nota : Znak
         }
         else
         {
-            if (Delka == -1)
+            if (Delka == 3)
             {
                 gameObject.GetComponent<Image>().sprite = Gfx.Nota_pull;
             }
@@ -614,8 +604,7 @@ public class Nota : Znak
 
 public class Pomlka : Znak
 {
-    GameObject postfix_GO;
-    int postfix = 0;// 0 = nic 1 = tecka(delka * 1,5)
+    GameObject[] postfix_GO;
 
     public override string ToString()
     {
@@ -688,19 +677,19 @@ public class Pomlka : Znak
         //delka pomka
         switch (Delka)
         {
-            case 0:
+            case 4:
                 gameObject.GetComponent<Image>().sprite = Gfx.P_cela;
                 break;
-            case -1:
+            case 3:
                 gameObject.GetComponent<Image>().sprite = Gfx.P_pull;
                 break;
-            case -2:
+            case 2:
                 gameObject.GetComponent<Image>().sprite = Gfx.P_ctvrt;
                 break;
-            case -3:
+            case 1:
                 gameObject.GetComponent<Image>().sprite = Gfx.P_osmina;
                 break;
-            case -4:
+            case 0:
                 gameObject.GetComponent<Image>().sprite = Gfx.P_sestnactina;
                 break;
             default:
@@ -708,19 +697,26 @@ public class Pomlka : Znak
         }
 
         //postfix
-        if (postfix != 0)
+        for (int i = 0; i < postfix_GO.GetLength(0); i++)
         {
-            postfix_GO.SetActive(true);
-        }
-        else
-        {
-            postfix_GO.SetActive(false);
+            if (postfix > i)
+            {
+                postfix_GO[i].SetActive(true);
+
+            }
+            else
+            {
+                postfix_GO[i].SetActive(false);
+            }
         }
     }
 
     public override void Do_data()
     {
-        postfix_GO = gameObject.transform.GetChild(2).gameObject;
+        postfix_GO = new GameObject[3];
+        postfix_GO[0] = gameObject.transform.GetChild(2).gameObject;
+        postfix_GO[1] = gameObject.transform.GetChild(8).gameObject;
+        postfix_GO[2] = gameObject.transform.GetChild(9).gameObject;
         Update_gfx();
     }
 }

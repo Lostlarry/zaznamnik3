@@ -26,8 +26,7 @@ public class Change_ctrl : MonoBehaviour
 
     public void Mod_vyska(int Change)
     {
-        int vyska = prototype.Vyska + Change;
-        prototype.Vyska = vyska;
+        prototype.Vyska = prototype.Vyska + Change;
         Vyska_txt.text = prototype.Vyska.ToString();
     }
 
@@ -38,25 +37,17 @@ public class Change_ctrl : MonoBehaviour
 
     public void Mod_delka(int Change)
     {
-        int delka = prototype.Delka + Change;
-        prototype.Delka = delka;
-        Delka_txt.text = "1/" + Math.Pow(2, -delka).ToString();
+        prototype.Delka = prototype.Delka + Change;
+        Delka_txt.text = Math.Pow(2, prototype.Delka).ToString();
     }
 
     public void Input_delka(string Target_delka)
     {
-        char[] filter = new char[1] { '/' };
-        string[] data = Target_delka.Split(filter, StringSplitOptions.RemoveEmptyEntries);
-        int output;
-        if (int.TryParse(data[1],out output))
+        if (int.TryParse(Target_delka, out int output))
         {
-            prototype.Delka = -Double_to_int(Math.Sqrt(output));
-            Delka_txt.text = "1/" + Math.Pow(2, -prototype.Delka).ToString();
+            prototype.Delka = (int)Math.Floor(Math.Sqrt(output));
         }
-        else
-        {
-            Delka_txt.text = "1/" + Math.Pow(2, -prototype.Delka).ToString();
-        }
+        Delka_txt.text = Math.Pow(2, prototype.Delka).ToString();
     }
 
     public void Input_state(bool is_nota)
@@ -70,8 +61,8 @@ public class Change_ctrl : MonoBehaviour
             for (int i = 0; i < vyska_buttons.GetLength(0); i++)
             {
                 vyska_buttons[i].enabled = is_nota;
-                Vyska_txt.enabled = is_nota;
             }
+            Vyska_txt.enabled = is_nota;
             swaping = false;
         }
     }
@@ -106,8 +97,9 @@ public class Change_ctrl : MonoBehaviour
             target_note = target;
             pred.Activate(CTRL.predznamenani);
             int[] output = prototype.Copy(target);
+
             Vyska_txt.text = output[0].ToString();
-            Delka_txt.text = output[1].ToString();
+            Delka_txt.text = Math.Pow(2, output[1]).ToString();
             if (output[2] == 1)
             {
                 nota.isOn = true;
@@ -173,20 +165,5 @@ public class Change_ctrl : MonoBehaviour
     void Update()
     {
         
-    }
-
-    public static int Double_to_int(double input)
-    {
-        int output = 0;
-        int mod = 1;
-        if (input < 0)
-        {
-            mod = -1;
-        }
-        while(output+1 < input)
-        {
-            output = output + mod;
-        }
-        return output;
     }
 }

@@ -2650,7 +2650,10 @@ MonoBehaviour:
   master: {fileID: 189882944}
   prefix_GO: {fileID: 659363467}
   topfix_GO: {fileID: 901593923}
-  postfix_GO: {fileID: 1036884932}
+  postfix_GO:
+  - {fileID: 1036884932}
+  - {fileID: 302073091}
+  - {fileID: 2067575038}
   carka_licha: {fileID: 1783601989}
   carka_suda: {fileID: 1834274314}
   prapor_GOs:
@@ -4351,13 +4354,13 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 474199181}
   m_TextComponent: {fileID: 1984498394}
   m_Placeholder: {fileID: 1700797807}
-  m_ContentType: 0
+  m_ContentType: 2
   m_InputType: 0
   m_AsteriskChar: 42
-  m_KeyboardType: 0
+  m_KeyboardType: 4
   m_LineType: 0
   m_HideMobileInput: 0
-  m_CharacterValidation: 0
+  m_CharacterValidation: 1
   m_CharacterLimit: 4
   m_OnEndEdit:
     m_PersistentCalls:
