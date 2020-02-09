@@ -14,6 +14,8 @@ public class HUD_ctrl : MonoBehaviour
     public bool auth = false;
     public GameObject[] auth_able;
 
+    Line_Ctrl last;
+
     public int posy;
     public bool select; 
 
@@ -41,6 +43,10 @@ public class HUD_ctrl : MonoBehaviour
         else
         {
             posy = target.Pos_y;
+            if (last == null)
+            {
+                last = CTRL.get_linka(target.master, posy);
+            }
             float posx = target.Pos_x;
             if (target.Delka == 4)
             {
@@ -50,14 +56,14 @@ public class HUD_ctrl : MonoBehaviour
             {
                 posx++;
             }
-            if (target.linka.full)
+            if (CTRL.get_linka(target.master, posy).full)
             {
-                Send_Command(10);
                 posy++;
+                last.hud = false;
+                last = CTRL.get_linka(target.master, posy, true);
                 posx = 0;
             }
-            gameObject.transform.position = ref_point + new Vector3(posx * target.linka.nota_lenght, (mod + posy) * Hand_Ctrl.vyska_linek, 0);
-            CTRL.Do_Takty(target.master);
+            gameObject.transform.position = ref_point + new Vector3(posx * CTRL.get_linka(target.master, posy).nota_lenght, (mod + posy) * Hand_Ctrl.vyska_linek, 0);
         }
     }
 

@@ -17,7 +17,7 @@ public class Znak : MonoBehaviour
 
     public Holder master;
 
-    public Line_Ctrl linka;
+    private Line_Ctrl linka;
     protected Takt takt;
     protected Znak prev;
     protected Znak next;
@@ -54,7 +54,7 @@ public class Znak : MonoBehaviour
         }
         set
         {
-            linka = CTRL.get_linka(master ,value);
+            Linka = CTRL.get_linka(master ,value);
             pos_y = value;
         }
     }
@@ -81,6 +81,11 @@ public class Znak : MonoBehaviour
     }
 
     public Takt Takt { get => takt; set => takt = value; }
+    public Line_Ctrl Linka
+    {
+        get => linka;
+        set => linka = value;
+    }
 
     public void Update_delka()
     {
@@ -150,7 +155,6 @@ public class Znak : MonoBehaviour
         Update_gfx();
         if (next != null)
         {
-            CTRL.Recalc(next);
             CTRL.Do_Takty(master);
         }
     }
@@ -160,18 +164,14 @@ public class Znak : MonoBehaviour
         Delka = Z.Delka;
     }
 
-    public virtual void Calc_Pos(bool update = false)
+    public virtual void Calc_Pos()
     {
-        if (update)
-        {
-            Bump_pos();
-        }
         int mod_y = 0;
         if (hand_id > 0)
         {
             mod_y = hand_id - 1 + Pos_y;
         }
-        gameObject.transform.position = ref_point + new Vector3((Pos_x * linka.nota_lenght), (Pos_y + mod_y) * Hand_Ctrl.vyska_linek, 0);
+        gameObject.transform.position = ref_point + new Vector3((Pos_x * Linka.nota_lenght), (Pos_y + mod_y) * Hand_Ctrl.vyska_linek, 0);
     }
 
     public void Swap_Pos(Znak target)
@@ -273,7 +273,11 @@ public class Znak : MonoBehaviour
     }
 
     public bool Bump_pos()
-    { 
+    {
+        if (prev == null)
+        {
+            return false;
+        }
         bool output = false;
         pos_x = prev.pos_x;
         if (prev.Delka == 4)
@@ -284,14 +288,10 @@ public class Znak : MonoBehaviour
         {
             pos_x++;
         }
-        Pos_y = prev.Pos_y;
-        if (prev.linka.full)
+        if (Linka != null)
         {
-            pos_x = 0;
-            Pos_y++;
-            output = true;
+            Pos_y = Linka.id; 
         }
-        CTRL.Do_Takty(master);
         Calc_Pos();
         return output;
     }
@@ -306,9 +306,9 @@ public class Znak : MonoBehaviour
         if (input[0] == 0)
         {
             Delka = input[1];
+            CTRL.Do_Takty(master);
             Calc_Pos();
             Update_gfx();
-            CTRL.Recalc(next);
         }
     }
 
@@ -337,18 +337,18 @@ public class Nota : Znak
     int prefix = 0;// 0= nic 1 = krizky 2 = becka 3 = cista 
     int topfix = 0;// 0 = nic 1 
 
-    public override void Calc_Pos(bool update = false)
+    public override void Calc_Pos()
     {
-        if (update)
+        if (Linka == null)
         {
-            Bump_pos();
+            return;
         }
         int mod = 0;
         if (hand_id > 0)
         {
             mod = hand_id - 1 + Pos_y;
         }
-        gameObject.transform.position = ref_point + new Vector3(Pos_x * linka.nota_lenght, (Pos_y + mod) * Hand_Ctrl.vyska_linek + vyska * nota_height, 0);
+        gameObject.transform.position = ref_point + new Vector3(Pos_x * Linka.nota_lenght, (Pos_y + mod) * Hand_Ctrl.vyska_linek + vyska * nota_height, 0);
         //prevraceni
         if (vyska > 1)
         {
@@ -451,9 +451,9 @@ public class Nota : Znak
             prefix = input[3];
             topfix = input[4];
             vyska = input[5];
+            CTRL.Do_Takty(master);
             Calc_Pos();
             Update_gfx();
-            CTRL.Recalc(next);
         }
     }
 
@@ -686,9 +686,9 @@ public class Pomlka : Znak
         {
             Delka = input[1];
             postfix = input[2];
+            CTRL.Do_Takty(master);
             Calc_Pos();
             Update_gfx();
-            CTRL.Recalc(next);
         }
     }
 

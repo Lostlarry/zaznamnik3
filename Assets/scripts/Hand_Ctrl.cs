@@ -219,7 +219,6 @@ public class Hand_Ctrl : MonoBehaviour
             if (middle && target.Next != null)
             {
                 made.Next = target.Next;
-                Recalc(made.Next);
             }
             else
             {
@@ -233,13 +232,16 @@ public class Hand_Ctrl : MonoBehaviour
         {
             hold.Prvni = made;
             hold.Posledni = made;
-            made.linka = hold.first;
+            made.Linka = hold.first;
             made.Calc_Pos();
         }
-
-         
         made.Update_delka();
+        Do_Takty(hold);
         hold.vybrany = made;
+        if (hold.nakonec != null)
+        {
+            hold.nakonec.add(made); 
+        }
         Select_hand(hold);
         Select_HUD.Adjust_HUD(made);
         return made;
@@ -286,7 +288,6 @@ public class Hand_Ctrl : MonoBehaviour
             if (middle && target.Next != null)
             {
                 made.Next = target.Next;
-                Recalc(made.Next);
             }
             else
             {
@@ -300,11 +301,16 @@ public class Hand_Ctrl : MonoBehaviour
         {
             hold.Prvni = made;
             hold.Posledni = made;
-            made.linka = hold.first;
+            made.Linka = hold.first;
             made.Calc_Pos();
         }
         made.Update_delka();
+        Do_Takty(hold);
         hold.vybrany = made;
+        if (hold.nakonec != null)
+        {
+            hold.nakonec.add(made);
+        }
         Select_HUD.Adjust_HUD(made);
         Select_hand(hold);
         return made;
@@ -348,11 +354,11 @@ public class Hand_Ctrl : MonoBehaviour
                 break;
             case 3:
                 hands[selected_hand].vybrany.Nota_Long();
-                Recalc(hands[selected_hand].vybrany);
+                Do_Takty(hands[selected_hand]);
                 break;
             case 4:
                 hands[selected_hand].vybrany.Nota_Short();
-                Recalc(hands[selected_hand].vybrany);
+                Do_Takty(hands[selected_hand]);
                 break;
             case 5:
                 Shift_next();
@@ -410,6 +416,7 @@ public class Hand_Ctrl : MonoBehaviour
             target.Swap_Pos(swap);
         }
         Select_HUD.Adjust_HUD(target);
+        End_HUD.Adjust_HUD(target.master.Posledni);
     }
 
     private void Shift_next(Znak target = null)
@@ -444,7 +451,7 @@ public class Hand_Ctrl : MonoBehaviour
             target.Swap_Pos(swap);
         }
         Select_HUD.Adjust_HUD(target);
-
+        End_HUD.Adjust_HUD(target.master.Posledni);
     }
 
     private void Remove(Znak target = null)
@@ -460,7 +467,7 @@ public class Hand_Ctrl : MonoBehaviour
             {
                 target.Next.Prev = target.Prev;
                 target.Prev.Next = target.Next;
-                Recalc(target.Next);
+                Do_Takty(target.master);
             }
             else
             {
@@ -470,7 +477,7 @@ public class Hand_Ctrl : MonoBehaviour
         }
         else if (target.Next != null)
         {
-            Recalc(target.Next);
+            Do_Takty(target.master);
             target.Next.Prev = null;
             target.master.Prvni = target.Next;
         }
@@ -480,7 +487,8 @@ public class Hand_Ctrl : MonoBehaviour
             target.master.Posledni = null;
         }
        Destroy(target.gameObject);
-
+       Select_HUD.Adjust_HUD(target.master.Posledni);
+       End_HUD.Adjust_HUD(target.master.Posledni);
     }
 
     private void Change(Znak target = null)
@@ -595,15 +603,8 @@ public class Hand_Ctrl : MonoBehaviour
         }
     }
 
-    public void Add_line(Holder hold)
+    public Line_Ctrl Add_line(Holder hold)
     {
-        if (hold.selected != null)
-        {
-            if (hold.selected.Next != null)
-            {
-                return;
-            }
-        }
         GameObject novy = Instantiate(proto_linka, paper.transform, false);
         novy.gameObject.name = "linka " + hold.linek + " " + hold.id;
         GameObject klic = Instantiate(proto_klic, paper.transform, false);
@@ -651,6 +652,7 @@ public class Hand_Ctrl : MonoBehaviour
             hold.selected = LC;
         }
         hold.linek++;
+        return LC;
     }
 
     void Start()
@@ -660,16 +662,16 @@ public class Hand_Ctrl : MonoBehaviour
     }
     void Update(){}
 
-    public void Recalc(Znak target)
+    public void Recalc(Znak from, Znak to = null)
     {
-        if (target != null)
+        if (from != null)
         {
-            Holder hold = target.master;
-            while (target != null)
+            Holder hold = from.master;
+            while (from != to)
             {
-                target.Calc_Pos(true);
-                target.Update_delka();
-                target = target.Next;
+                from.Bump_pos();
+                from.Update_delka();
+                from = from.Next;
             }
             Select_HUD.Adjust_HUD(hold.Posledni);
             End_HUD.Adjust_HUD(hold.Posledni);
@@ -686,8 +688,6 @@ public class Hand_Ctrl : MonoBehaviour
     {
         if (hold.pocatek != null)
         {
-
-             
             hold.pocatek.recalc(hold.Prvni);
             hold.first.count(hold.pocatek); 
         }
@@ -696,6 +696,11 @@ public class Hand_Ctrl : MonoBehaviour
     public Takt Add_takt(Holder hold, Znak targ)
     {
         Takt made;
+        hold.first.count(hold.pocatek);
+        if (hold.last.full)
+        {
+            Add_line(hold);
+        }
         if (hold.nakonec == null)
         {
             made = new Takt(Instantiate(proto_takt, hold.first.transform, false), targ, null, hold.last);
@@ -707,10 +712,12 @@ public class Hand_Ctrl : MonoBehaviour
             made = new Takt(Instantiate(proto_takt, hold.first.transform, false), targ, hold.nakonec, hold.last);
             hold.nakonec = made;
         }
+        made.cara.name = "takt " + hold.taktu;
+        hold.taktu++;
         return made;
     }
 
-    public Line_Ctrl get_linka(Holder hold, int input)
+    public Line_Ctrl get_linka(Holder hold, int input, bool hud = true)
     {
         Line_Ctrl selected = hold.first;
         while (selected != null)
@@ -724,8 +731,8 @@ public class Hand_Ctrl : MonoBehaviour
                 selected = selected.Next;
             }
         }
-        Debug.Log("FOUND NO LINKA OF GIVEN ID");
-        return null;
+        Add_line(hold).hud = hud;
+        return Add_line(hold);
     }
 }
 
@@ -734,6 +741,7 @@ public class Holder
     public int id;
     public int not = 0;
     public int linek = 0;
+    public int taktu = 0;
 
     public Znak vybrany;
     public Znak Prvni;

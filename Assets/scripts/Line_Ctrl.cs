@@ -20,25 +20,38 @@ public class Line_Ctrl : MonoBehaviour
     Takt last;
 
     public int id = 0;
+    public bool hud = true;
 
     public bool full = false;
-    public float nota_lenght = 475.2f / 23;
+    public float nota_lenght = 396f / 15;
 
     public Line_Ctrl Next { get => next; set => next = value; }
     public Line_Ctrl Prev { get => prev; set => prev = value; }
     public Takt Last { get => last; set => last = value; }
 
-    void Start()
-    {
-    }
+    void Start() { }
     void Update() { }
 
     public void SetActive(bool state, bool cascade = false)
     {
+        if (hud)
+        {
+            state = true;
+        }
         klic.SetActive(state);
         end.SetActive(state);
         pred.SetActive(state);
         gameObject.SetActive(state);
+        Takt selected = first;
+        if (selected != null)
+        {
+            while (selected != last)
+            {
+                selected.SetActive(false);
+                selected = selected.next;
+            }
+            selected.SetActive(false); 
+        }
         if (cascade)
         {
             if (next != null)
@@ -48,16 +61,15 @@ public class Line_Ctrl : MonoBehaviour
         }
     }
 
-    public void count(Takt selected)
+    public void count(Takt selected, bool repeat = true)
     {
-
-         
         if (selected == null)
         {
             if (End_hud.posy != id)
             {
                 SetActive(false, true);
             }
+            return;
         }
         if (!selected.status)
         {
@@ -65,9 +77,10 @@ public class Line_Ctrl : MonoBehaviour
         }
         float sum = 0;
         first = selected;
+        full = false;
         while (selected != null && !full)
         {
-            if (sum + selected.count() <= 22)
+            if (sum + selected.count() <= 15)
             {
                 selected.LC = this;
                 sum = sum + selected.count();
@@ -87,12 +100,12 @@ public class Line_Ctrl : MonoBehaviour
             }
             else
             {
-                Znak.CTRL.Add_line(master);
-                next.count(selected);
+                Znak.CTRL.Add_line(master).count(selected);
             }
         }
         else
         {
+            selected = first;
             while (selected.next != null)
             {
                 selected = selected.next;
@@ -106,11 +119,43 @@ public class Line_Ctrl : MonoBehaviour
 
         if (full)
         {
-            nota_lenght = 475.2f / sum;
+            if (last.posledni == null && repeat)
+            {
+                first = last;
+                count(first, false);
+                return;
+            }
+            if (last.posledni.Delka == 4)
+            {
+                sum = sum - 1.5f;
+            }
+            else
+            {
+                sum--;
+            }
+            nota_lenght = 396f / sum;
+            Znak.CTRL.Recalc(first.prvni, last.posledni);
+            selected = first;
+            while (selected != last)
+            {
+                selected.Repos();
+                selected = selected.next;
+            }
+            selected.Repos();
+            last.SetActive(false);
         }
         else
         {
-            nota_lenght = 475.2f / 22;
+            nota_lenght = 396f / 15;
+            Znak.CTRL.Recalc(first.prvni, last.posledni);
+            selected = first;
+            while (selected != last)
+            {
+                selected.Repos();
+                selected = selected.next;
+            }
+            selected.Repos();
+            last.SetActive(true);
         }
     }
 
@@ -135,29 +180,46 @@ public class Takt
 {
     public GameObject cara;
 
-    Znak prvni;
-    Znak posledni;
+    public Znak prvni;
+    public Znak posledni;
 
     public Takt next;
     public Takt prev;
 
-    public Line_Ctrl LC;
+    private Line_Ctrl lC;
     bool full = false;
 
     public bool status = true;
 
     public double delka;
 
-    public void SetActive(bool state, bool cascade = false, int call = 0)
+    public Line_Ctrl LC
     {
+        get => lC;
+        set
+        {
+            lC = value;
+            Znak vybrany = prvni;
+            if (vybrany != null)
+            {
+                while (vybrany != posledni)
+                {
+                    vybrany.Linka = value;
+                    vybrany = vybrany.Next;
+                }
+                vybrany.Linka = lC; 
+            }
+        }
+    }
+    
 
-        call++;
-        Debug.Log(call);
+    public void SetActive(bool state, bool cascade = false)
+    {
         status = state;
         cara.SetActive(state);
         if (cascade && next != null)
         {
-            next.SetActive(false, true, call);
+            next.SetActive(false, true);
         }
     }
 
@@ -165,6 +227,10 @@ public class Takt
     {
         this.cara = cara;
         this.prvni = prvni;
+        if (posledni == null)
+        {
+            posledni = prvni;
+        }
         if (prev != null)
         {
             this.prev = prev;
@@ -172,12 +238,11 @@ public class Takt
         }
         LC = lC;
         LC.Last = this;
+        cara.transform.position = new Vector3(posledni.transform.position.x + 8f, LC.transform.position.y);
     }
 
     public void recalc(Znak vybrany)
     {
-
-         
         prvni = vybrany;
         if (vybrany == null)
         {
@@ -206,12 +271,12 @@ public class Takt
         {
             if (next != null)
             {
-                next.recalc(vybrany); 
+                next.recalc(vybrany.Next); 
             }
             else
             {
                 next = Znak.CTRL.Add_takt(LC.master, vybrany);
-                next.recalc(vybrany);
+                next.recalc(vybrany.Next);
             }
         }
         else
@@ -226,6 +291,15 @@ public class Takt
             {
                 next.SetActive(false, true);
             }
+        }
+        cara.transform.position = new Vector3(posledni.transform.position.x + 8f, LC.transform.position.y);
+    }
+
+    public void Repos()
+    {
+        if (posledni != null)
+        {
+            cara.transform.position = new Vector3(posledni.transform.position.x + 8f, LC.transform.position.y);
         }
     }
 
@@ -246,28 +320,33 @@ public class Takt
             }
             vybrany = vybrany.Next;
         }
-        if (vybrany.Delka == 4)
+        if (vybrany != null)
         {
-            sum = sum + 1.5f;
-        }
-        else
-        {
-            sum++;
+            if (vybrany.Delka == 4)
+            {
+                sum = sum + 1.5f;
+            }
+            else
+            {
+                sum++;
+            } 
         }
         return sum;
     }
 
     public double Delka()// call only after recalc
     {
-        Znak.CTRL.Do_Takty(LC.master);
         Znak vybrany = prvni;
         double sum = 0;
-        while (vybrany != posledni)
+        if (vybrany != null)
         {
-            sum = sum + Math.Pow(2, vybrany.Delka) * (2 - Math.Pow(2, -vybrany.Postfix));
-            vybrany = vybrany.Next;
+            while (vybrany != posledni)
+            {
+                sum = sum + Math.Pow(2, vybrany.Delka) * (2 - Math.Pow(2, -vybrany.Postfix));
+                vybrany = vybrany.Next;
+            }
+            sum = sum + Math.Pow(2, vybrany.Delka) * (2 - Math.Pow(2, -vybrany.Postfix)); 
         }
-        sum = sum + Math.Pow(2, vybrany.Delka) * (2 - Math.Pow(2, -vybrany.Postfix));
         return sum;
     }
 
@@ -283,6 +362,7 @@ public class Takt
                 prvni = target;
                 SetActive(true);
             }
+            posledni = target;
         }
         else
         {
