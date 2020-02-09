@@ -96,11 +96,11 @@ public class Line_Ctrl : MonoBehaviour
         {
             if (next != null)
             {
-                next.count(selected);
+                next.count(selected.next);
             }
             else
             {
-                Znak.CTRL.Add_line(master).count(selected);
+                Znak.CTRL.Add_line(master).count(selected.next);
             }
         }
         else
@@ -134,11 +134,14 @@ public class Line_Ctrl : MonoBehaviour
                 sum--;
             }
             nota_lenght = 396f / sum;
-            Znak.CTRL.Recalc(first.prvni, last.posledni);
+            first.prvni.Pos_x = 0;
+            first.prvni.Calc_Pos();
+            Znak.CTRL.Recalc(first.prvni.Next, last.posledni);
             selected = first;
             while (selected != last)
             {
                 selected.Repos();
+                selected.SetActive(true);
                 selected = selected.next;
             }
             selected.Repos();
@@ -147,15 +150,24 @@ public class Line_Ctrl : MonoBehaviour
         else
         {
             nota_lenght = 396f / 15;
-            Znak.CTRL.Recalc(first.prvni, last.posledni);
+            if (first.prvni != null)
+            {
+                first.prvni.Pos_x = 0;
+                first.prvni.Calc_Pos();
+                if (first.prvni.Next != null)
+                {
+                    Znak.CTRL.Recalc(first.prvni.Next, last.posledni);
+                } 
+            }
             selected = first;
             while (selected != last)
             {
                 selected.Repos();
+                selected.SetActive(true);
                 selected = selected.next;
             }
             selected.Repos();
-            last.SetActive(true);
+            last.SetActive(false);
         }
     }
 

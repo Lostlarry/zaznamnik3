@@ -671,6 +671,11 @@ public class Hand_Ctrl : MonoBehaviour
             {
                 from.Bump_pos();
                 from.Update_delka();
+                if (from.Next == null && to != null)
+                {
+                    Recalc(to, from);
+                    return;
+                }
                 from = from.Next;
             }
             Select_HUD.Adjust_HUD(hold.Posledni);

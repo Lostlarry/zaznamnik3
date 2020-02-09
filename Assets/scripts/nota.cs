@@ -292,6 +292,16 @@ public class Znak : MonoBehaviour
         {
             Pos_y = Linka.id; 
         }
+        else
+        {
+            pos_y = prev.pos_y;
+            if (CTRL.get_linka(master, pos_y).full)
+            {
+                Pos_x = 0;
+                pos_y++;
+                linka = CTRL.get_linka(master, pos_y);
+            }
+        }
         Calc_Pos();
         return output;
     }
@@ -343,6 +353,7 @@ public class Nota : Znak
         {
             return;
         }
+        pos_y = Linka.id;
         int mod = 0;
         if (hand_id > 0)
         {
