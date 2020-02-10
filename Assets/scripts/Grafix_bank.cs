@@ -23,6 +23,7 @@ public class Grafix_bank : MonoBehaviour
 
     public Sprite B_klic;
     public Sprite H_klic;
+    public Sprite Lig_left;
 
     // Start is called before the first frame update
     void Start()

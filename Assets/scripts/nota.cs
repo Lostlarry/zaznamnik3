@@ -23,6 +23,9 @@ public class Znak : MonoBehaviour
     protected Znak prev;
     protected Znak next;
 
+    protected GameObject lig_next;
+    protected GameObject lig_prev;
+
     protected float pos_x = 0;
     protected float dist_x = 0;
     protected int pos_y = 0;
@@ -61,7 +64,6 @@ public class Znak : MonoBehaviour
         set
         {
             delka = value;
-            Update_delka();
             if (Delka < 0)
             {
                 Delka = 0;
@@ -70,16 +72,28 @@ public class Znak : MonoBehaviour
         }
     }
 
+    public virtual GameObject Lig_next
+    {
+        get => lig_next;
+        set { }
+    }
+
+    public virtual GameObject Lig_prev
+    {
+        get => lig_prev;
+        set { }
+    }
+
     public void Update_delka()
     {
-        if ((dist_x % CTRL.takt + Math.Pow(2, delka) * (2 - Math.Pow(2, -postfix))) > CTRL.takt)
+        if ((pos_x % 1 * CTRL.takt + Math.Pow(2, delka) * (2 - Math.Pow(2, -postfix))) > CTRL.takt)
         {
-            Adapt(CTRL.takt - dist_x % CTRL.takt);
+            Adapt(CTRL.takt - pos_x % 1 * CTRL.takt);
             Do_lig();
         }
     }
 
-    public void Adapt(float input)
+    public void Adapt(float input, bool made = false)
     {
         Debug.Log(gameObject.name + " k " + input);
         float rem_input = input;
@@ -87,7 +101,7 @@ public class Znak : MonoBehaviour
         int targ_post = 0;
         for (int i = 4; i > -1; i--)
         {
-            if (Math.Pow(2, i) < rem_input)
+            if (Math.Pow(2, i) <= rem_input)
             {
                 if (tmp_delka < 0)
                 {
@@ -96,7 +110,7 @@ public class Znak : MonoBehaviour
                 }
                 else
                 {
-                    rem_input = rem_input - (float)Math.Pow(2, i) * tmp_delka;
+                    rem_input = rem_input - (float)Math.Pow(2, i) * (float)Math.Pow(2, tmp_delka);
                     targ_post++;
                 }
             }
@@ -110,36 +124,47 @@ public class Znak : MonoBehaviour
         {
             if (is_nota())
             {
-                CTRL.Add_Nota(master, this, 1).Adapt(rem_input);
+                CTRL.Add_Nota(master, this, 1, rem_input);
             }
             else
             {
-                CTRL.Add_Pomlka(master, this, 1).Adapt(rem_input);
+                CTRL.Add_Pomlka(master, this, 1, rem_input);
             }
             shifted = true;
         }
         Znak target = this;
-        if (shifted)
+        int Ex_delka = delka;
+        int Ex_postfix = postfix;
+        if (made)
         {
-            target = next;
+            Ex_delka = tmp_delka;
+            Ex_postfix = targ_post;
         }
-        if (is_nota())
-        {
-            CTRL.Add_Nota(master, target, 1).Adapt((float)(Math.Pow(2, delka) * (2 - Math.Pow(2, -postfix)) - input));
-        }
-        else
-        {
-            CTRL.Add_Pomlka(master, target, 1).Adapt((float)(Math.Pow(2, delka) * (2 - Math.Pow(2, -postfix)) - input));
-        }
-        Debug.Log(gameObject.name + "asdwadw");
         delka = tmp_delka;
         postfix = targ_post;
+        if (Math.Pow(2, Ex_delka) * (2 - Math.Pow(2, -Ex_postfix)) > input)
+        {
+            if (shifted)
+            {
+                target = next;
+            }
+            if (is_nota())
+            {
+                CTRL.Add_Nota(master, target, 1, (float)(Math.Pow(2, Ex_delka) * (2 - Math.Pow(2, -Ex_postfix)) - input));
+            }
+            else
+            {
+                CTRL.Add_Pomlka(master, target, 1, (float)(Math.Pow(2, Ex_delka) * (2 - Math.Pow(2, -Ex_postfix)) - input));
+            }
+        }
+        Debug.Log(gameObject.name + "asdwadw");
         Update_gfx();
     }
 
     public void Load(Znak Z)
     {
         Delka = Z.Delka;
+        Update_delka();
     }
 
     public virtual void Calc_Pos()
@@ -185,6 +210,8 @@ public class Znak : MonoBehaviour
 
     public virtual void Nota_Long(int i = 1)
     {
+
+        Update_delka();
         Update_gfx();
     }
 
@@ -194,6 +221,8 @@ public class Znak : MonoBehaviour
         {
             Delka = Delka - 1;
         }
+
+        Update_delka();
         Update_gfx();
     }
 
@@ -213,6 +242,8 @@ public class Znak : MonoBehaviour
             if (int.TryParse(data[1], out output))
             {
                 Delka = output;
+
+                Update_delka();
             }
             else
             {
@@ -227,7 +258,7 @@ public class Znak : MonoBehaviour
         return error;
     }
 
-    protected virtual void Do_lig()
+    public virtual void Do_lig(bool prev = false)
     {
     }
 
@@ -248,6 +279,8 @@ public class Znak : MonoBehaviour
         dist_x = target.dist_x;
         pos_y = target.pos_y;
         Pos_x = target.Pos_x;
+        Fix_lig();
+        target.Fix_lig();
     }
 
     public bool Bump_pos()
@@ -278,12 +311,26 @@ public class Znak : MonoBehaviour
         if (input[0] == 0)
         {
             Delka = input[1];
+
+            Update_delka();
             Calc_Pos();
             Update_gfx();
             CTRL.Recalc(next);
         }
+        Fix_lig();
     }
 
+    protected void Fix_lig()
+    {
+        if (lig_prev != null)
+        {
+            Do_lig(true);
+        }
+        else
+        {
+            Do_lig();
+        }
+    }
     protected virtual void Update_gfx() { }
     public virtual void Do_data() { }
 
@@ -309,6 +356,24 @@ public class Nota : Znak
     int prefix = 0;// 0= nic 1 = krizky 2 = becka 3 = cista 
     int topfix = 0;// 0 = nic 1 
 
+    public override GameObject Lig_next
+    {
+        get => lig_next;
+        set
+        {
+            lig_next = value;
+        }
+    }
+
+    public override GameObject Lig_prev
+    {
+        get => lig_prev;
+        set
+        {
+            lig_prev = value;
+        }
+    }
+
     public override void Calc_Pos()
     {
         int mod = 0;
@@ -330,6 +395,7 @@ public class Nota : Znak
             prefix_GO.transform.position = new Vector3(Math.Abs(prefix_GO.transform.position.x), prefix_GO.transform.position.y, prefix_GO.transform.position.z);
             prefix_GO.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
         }
+        Fix_lig();
     }
 
     public override void Nota_Up(int i = 1)
@@ -346,7 +412,7 @@ public class Nota : Znak
 
     public override string ToString()
     {
-        return "N,"+Delka+","+vyska+","+prefix+","+postfix+";";
+        return "N,"+Delka+","+vyska+","+prefix+","+postfix+","+(lig_prev!=null)+";";
     }
 
     public override bool is_nota()
@@ -365,6 +431,7 @@ public class Nota : Znak
             if (int.TryParse(data[1], out output))
             {
                 Delka = output;
+                Update_delka();
             }
             else
             {
@@ -397,6 +464,18 @@ public class Nota : Znak
             {
                 error = true;
             }
+            bool is_lig;
+            if (bool.TryParse(data[5], out is_lig))
+            {
+                if (is_lig)
+                {
+                    Do_lig(true);
+                }
+            }
+            else
+            {
+                error = true;
+            }
         }
         else
         {
@@ -419,10 +498,12 @@ public class Nota : Znak
             prefix = input[3];
             topfix = input[4];
             vyska = input[5];
+            Update_delka();
             Calc_Pos();
             Update_gfx();
             CTRL.Recalc(next);
         }
+        Fix_lig();
     }
 
     protected override void Update_gfx()
@@ -575,6 +656,86 @@ public class Nota : Znak
         }
     }
 
+    public override void Do_lig(bool previous = false)
+    {
+        if (previous)
+        {
+            if (prev != null)
+            {
+                prev.Do_lig(); 
+            }
+        }
+        else if (next != null)
+        {
+            if (Next.is_nota())
+            {
+                if (((Nota)next).vyska == vyska)
+                {
+                    if (lig_next != null && lig_next == Next.Lig_prev)
+                    {
+                        Destroy(lig_next);
+                    }
+                    else if (next.Pos_y == Pos_y)
+                    {
+                        if (lig_next != null)
+                        {
+                            Destroy(lig_next);
+                        }
+                        if (Next.Lig_prev != null)
+                        {
+                            Destroy(Next.Lig_prev);
+                        }
+                        Lig_next = CTRL.get_lig(0, this);
+                        Lig_next.transform.position = new Vector3((transform.position.x + Next.transform.position.x) / 2, transform.position.y + 5f);
+                        Lig_next.transform.localScale = new Vector3((transform.position.x - Next.transform.position.x) / (takt_width + cara_width) * 0.6f, 0.3f);
+                        Next.Lig_prev = lig_next;
+                        if (vyska > 1)
+                        {
+                            lig_next.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
+                        }
+                        else
+                        {
+                            lig_next.transform.rotation = Quaternion.Euler(0f, 0f, 180f);
+                        }
+                    }
+                    else
+                    {
+                        if (lig_next != null)
+                        {
+                            Destroy(lig_next);
+                        }
+                        if (Next.Lig_prev != null)
+                        {
+                            Destroy(Next.Lig_prev);
+                        }
+                        Lig_next = CTRL.get_lig(1, this);
+                        Lig_next.transform.position = new Vector3(transform.position.x +  36, transform.position.y);
+                        Next.Lig_prev = CTRL.get_lig(2, next);
+                        Next.Lig_prev.transform.position = new Vector3(Next.transform.position.x - 36, Next.transform.position.y);
+                        if (vyska > 1)
+                        {
+                            lig_next.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
+                            Next.Lig_prev.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
+                        }
+                        else
+                        {
+                            lig_next.transform.rotation = Quaternion.Euler(0f, 0f, 180f);
+                            Next.Lig_prev.transform.rotation = Quaternion.Euler(0f, 0f, 180f);
+                        }
+                    }
+                }
+                else
+                {
+                    Destroy(lig_next);
+                }
+            }
+            else
+            {
+                Destroy(lig_next);
+            }
+        }
+    }
+
     public override void Do_data()
     {
         prapor_GOs = new GameObject[2];
@@ -620,6 +781,7 @@ public class Pomlka : Znak
             if (int.TryParse(data[1], out output))
             {
                 Delka = output;
+                Update_delka();
             }
             else
             {
@@ -654,15 +816,11 @@ public class Pomlka : Znak
         {
             Delka = input[1];
             postfix = input[2];
+            Update_delka();
             Calc_Pos();
             Update_gfx();
             CTRL.Recalc(next);
         }
-    }
-
-    protected override void Do_lig()
-    {
-        
     }
 
     protected override void Update_gfx()
@@ -755,6 +913,7 @@ class Acord : Znak//not in use
             if (int.TryParse(data[1], out output))
             {
                 Delka = output;
+                Update_delka();
             }
             else
             {
@@ -778,6 +937,7 @@ class Acord : Znak//not in use
         {
             Delka = input[1];
             topfix = input[2];
+            Update_delka();
         }
     }
 }

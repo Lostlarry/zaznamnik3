@@ -15,6 +15,7 @@ public class Change_ctrl : MonoBehaviour
     public InputField Delka_txt;
 
     public Predznamenani pred;
+    public GameObject klic;
 
     public Toggle pomlka;
     public Toggle nota;
@@ -95,6 +96,19 @@ public class Change_ctrl : MonoBehaviour
         {
             swaping = true;
             target_note = target;
+            Vector3 pos = pred.transform.position;
+            Destroy(pred.gameObject);
+            Destroy(pred);
+            if (target_note.master.klic == 0)
+            {
+                pred = Instantiate(CTRL.proto_pred_h, transform, false).GetComponent<Predznamenani>();
+                klic.GetComponent<Image>().sprite = Znak.Gfx.H_klic;
+            }
+            else
+            {
+                pred = Instantiate(CTRL.proto_pred_b, transform, false).GetComponent<Predznamenani>();
+                klic.GetComponent<Image>().sprite = Znak.Gfx.B_klic;
+            }
             pred.Activate(CTRL.predznamenani);
             int[] output = prototype.Copy(target);
 
@@ -126,7 +140,7 @@ public class Change_ctrl : MonoBehaviour
             swaping = true;
             if (nota)
             {
-                int result = pred.Is_moded(prototype.Vyska);
+                int result = pred.Is_moded(prototype.Vyska, target_note.master.klic);
                 if (result == 1)
                 {
                     prefix[1].enabled = false;//krizek blokuje becko

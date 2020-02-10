@@ -51,8 +51,12 @@ public class Predznamenani : MonoBehaviour
         }
     }
 
-    public int Is_moded(int vyska)
+    public int Is_moded(int vyska, int klic)
     {
+        if (klic == 1)
+        {
+            vyska = vyska - 5;
+        }
         int mod_vyska = make_positive(vyska) % 7;
         if (odchylka > (mod_vyska + 1) * 2 % 7)
         {
