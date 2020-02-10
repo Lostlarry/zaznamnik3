@@ -92,6 +92,10 @@ public class Line_Ctrl : MonoBehaviour
                 selected.prev = last;
             }
         }
+        if (sum + 1 > 15)
+        {
+            full = true;
+        }
         if (selected != null)
         {
             if (next != null)
@@ -250,7 +254,7 @@ public class Takt
         }
         LC = lC;
         LC.Last = this;
-        cara.transform.position = new Vector3(posledni.transform.position.x + 8f, LC.transform.position.y);
+        cara.transform.position = new Vector3(posledni.transform.position.x, LC.transform.position.y);
     }
 
     public void recalc(Znak vybrany)
@@ -275,8 +279,15 @@ public class Takt
             }
             else
             {
-                posledni = vybrany.Prev;
-                full = true;
+                if (delka != Znak.CTRL.takt)
+                {
+                    vybrany.Adapt(Znak.CTRL.takt - (float)delka);
+                }
+                else
+                {
+                    posledni = vybrany.Prev;
+                    full = true;
+                }
             }
         }
         if (vybrany != null)
@@ -304,14 +315,14 @@ public class Takt
                 next.SetActive(false, true);
             }
         }
-        cara.transform.position = new Vector3(posledni.transform.position.x + 8f, LC.transform.position.y);
+        cara.transform.position = new Vector3(posledni.transform.position.x, LC.transform.position.y);
     }
 
     public void Repos()
     {
         if (posledni != null)
         {
-            cara.transform.position = new Vector3(posledni.transform.position.x + 8f, LC.transform.position.y);
+            cara.transform.position = new Vector3(posledni.transform.position.x, LC.transform.position.y);
         }
     }
 
@@ -378,14 +389,22 @@ public class Takt
         }
         else
         {
-            full = true;
-            if (next != null)
+            if (delka != Znak.CTRL.takt)
             {
-                next.add(target);
+                target.Update_delka();
+                recalc(prvni);
             }
             else
             {
-                next = Znak.CTRL.Add_takt(LC.master, target);
+                full = true;
+                if (next != null)
+                {
+                    next.add(target);
+                }
+                else
+                {
+                    next = Znak.CTRL.Add_takt(LC.master, target);
+                }
             }
         }
     }

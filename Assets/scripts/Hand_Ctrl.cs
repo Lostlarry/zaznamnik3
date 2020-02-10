@@ -177,7 +177,7 @@ public class Hand_Ctrl : MonoBehaviour
         }
     }
 
-    public Nota Add_Nota(Holder hold, Znak target = null, int input_delka = -1)
+    public Nota Add_Nota(Holder hold, Znak target = null, int input_delka = -1, float adapt = 0)
     {
         if (hold == null)
         {
@@ -197,22 +197,29 @@ public class Hand_Ctrl : MonoBehaviour
         made.Do_data();
         made.master = hold;
         made.Hand_id = hands.GetLength(0) - 1 + hold.id;
-        if (input_delka == -1)
+        if (adapt == 0)
         {
-            int tmp_delka = 1;
-            for (int i = 4; i > -1; i--)
+            if (input_delka == -1)
             {
-                if (Math.Pow(2, i) <= takt)
+                int tmp_delka = 1;
+                for (int i = 4; i > -1; i--)
                 {
-                    tmp_delka = i;
-                    i = -1;
+                    if (Math.Pow(2, i) <= takt)
+                    {
+                        tmp_delka = i;
+                        i = -1;
+                    }
                 }
+                made.Delka = tmp_delka;
             }
-            made.Delka = tmp_delka;
+            else
+            {
+                made.Delka = input_delka;
+            }
         }
         else
         {
-            made.Delka = input_delka;
+            made.Adapt(adapt, false);
         }
         if (target != null)
         {
@@ -247,7 +254,7 @@ public class Hand_Ctrl : MonoBehaviour
         return made;
     }
 
-    public Pomlka Add_Pomlka(Holder hold, Znak target = null, int input_delka = -1)
+    public Pomlka Add_Pomlka(Holder hold, Znak target = null, int input_delka = -1, float adapt = 0)
     {
         if (hold == null)
         {
@@ -266,22 +273,29 @@ public class Hand_Ctrl : MonoBehaviour
         made.Do_data();
         made.master = hold;
         made.Hand_id = hands.GetLength(0) - 1 + hold.id;
-        if (input_delka == -1)
+        if (adapt == 0)
         {
-            int tmp_delka = 1;
-            for (int i = 4; i > -1; i--)
+            if (input_delka == -1)
             {
-                if (Math.Pow(2, i) <= takt)
+                int tmp_delka = 1;
+                for (int i = 4; i > -1; i--)
                 {
-                    tmp_delka = i;
-                    i = -1;
+                    if (Math.Pow(2, i) <= takt)
+                    {
+                        tmp_delka = i;
+                        i = -1;
+                    }
                 }
+                made.Delka = tmp_delka;
             }
-            made.Delka = tmp_delka;
+            else
+            {
+                made.Delka = input_delka;
+            }
         }
         else
         {
-            made.Delka = input_delka;
+            made.Adapt(adapt, false);
         }
         if (target != null)
         {

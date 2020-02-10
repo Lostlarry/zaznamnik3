@@ -98,6 +98,10 @@ public class Znak : MonoBehaviour
 
     public void Adapt(float input, bool adding = true)
     {
+        if (input <= 0)
+        {
+            return;
+        }
         float rem_input = input;
         int tmp_delka = -1;
         int targ_post = 0;
@@ -112,7 +116,7 @@ public class Znak : MonoBehaviour
                 }
                 else
                 {
-                    rem_input = rem_input - (float)Math.Pow(2, i) * tmp_delka;
+                    rem_input = rem_input - ((float)Math.Pow(2, i)/16) * tmp_delka;
                     targ_post++;
                 }
             }
@@ -121,6 +125,10 @@ public class Znak : MonoBehaviour
                 i = 0;
             }
         }
+        int exdelka = delka;
+        int expost = postfix;
+        delka = tmp_delka;
+        postfix = targ_post;
         bool shifted = false;
         if (rem_input > 0)
         {
@@ -143,20 +151,14 @@ public class Znak : MonoBehaviour
             }
             if (is_nota())
             {
-                CTRL.Add_Nota(master, target, 1).Adapt((float)(Math.Pow(2, delka) * (2 - Math.Pow(2, -postfix)) - input), false);
+                CTRL.Add_Nota(master, target, 1, (float)(Math.Pow(2, exdelka) * (2 - Math.Pow(2, -expost)) - input));
             }
             else
             {
-                CTRL.Add_Pomlka(master, target, 1).Adapt((float)(Math.Pow(2, delka) * (2 - Math.Pow(2, -postfix)) - input), false);
+                CTRL.Add_Pomlka(master, target, 1, (float)(Math.Pow(2, exdelka) * (2 - Math.Pow(2, -expost)) - input));
             }
         }
-        delka = tmp_delka;
-        postfix = targ_post;
         Update_gfx();
-        if (next != null)
-        {
-            CTRL.Do_Takty(master);
-        }
     }
 
     public void Load(Znak Z)
