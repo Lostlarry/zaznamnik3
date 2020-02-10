@@ -12,8 +12,9 @@ public class Save_Load : MonoBehaviour
     string input = "";
 
     public bool Save()
-    {/*
-        string savefile = strEx("Save File", "nml", "/saves");
+    {
+        string savefile = "SaveFile.nml";
+        //string savefile = strEx("Save File", "nml", "/saves");
         if (savefile != "")
         {
             string output = gameObject.GetComponent<Hand_Ctrl>().ToString();
@@ -21,20 +22,21 @@ public class Save_Load : MonoBehaviour
             writer.WriteLine(output);
             writer.Close();
             return true;
-        }*/
+        }
         return false;
         
     }
     public bool Load()
-    {/*
-        string savefile = strEx("Load File", "nml", "/saves");
-        if ( savefile != "")
+    {
+        string savefile = "SaveFile.nml";
+        //string savefile = strEx("Load File", "nml", "/saves");
+        if (System.IO.File.Exists(savefile))
         {
             TextReader reader = new StreamReader(savefile);
             input = reader.ReadLine();
             reader.Close();
             return true;
-        }*/
+        }
         return false;
     }
     /*
