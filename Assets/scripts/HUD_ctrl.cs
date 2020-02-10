@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 public class HUD_ctrl : MonoBehaviour
 {
-    const float modx = -180f;
+    const float modx = -150f;
     const float mody = -56f;
 
     public Hand_Ctrl CTRL;
@@ -27,7 +27,7 @@ public class HUD_ctrl : MonoBehaviour
         }
         if (select)
         {
-            gameObject.transform.position = ref_point + new Vector3(target.Pos_x * Znak.takt_width, (mod + target.Pos_y) * Hand_Ctrl.vyska_linek, 0);
+            gameObject.transform.position = ref_point + new Vector3(target.Pos_x * Znak.takt_width + (float)Math.Floor(target.Pos_x) * Znak.cara_width, (mod + target.Pos_y) * Hand_Ctrl.vyska_linek, 0);
             for (int i = 0; i < toggle_able.GetLength(0); i++)
             {
                 toggle_able[i].SetActive(target.is_nota());
@@ -47,7 +47,7 @@ public class HUD_ctrl : MonoBehaviour
                 posy++;
                 posx = 0;
             }
-            gameObject.transform.position = ref_point + new Vector3(posx * Znak.takt_width, (mod + posy) * Hand_Ctrl.vyska_linek, 0);
+            gameObject.transform.position = ref_point + new Vector3(posx * Znak.takt_width + (float)Math.Floor(posx) * Znak.cara_width, (mod + posy) * Hand_Ctrl.vyska_linek, 0);
         }
     }
 

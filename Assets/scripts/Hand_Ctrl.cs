@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Hand_Ctrl : MonoBehaviour
 {
@@ -9,6 +10,8 @@ public class Hand_Ctrl : MonoBehaviour
     public HUD_ctrl Select_HUD;
     public HUD_ctrl End_HUD;
     public GameObject paper;
+    public GameObject takt_top;
+    public GameObject takt_bot;
 
     public GameObject proto_nota;
     public GameObject proto_linka;
@@ -188,7 +191,7 @@ public class Hand_Ctrl : MonoBehaviour
             int tmp_delka = 1;
             for (int i = 4; i > -1; i--)
             {
-                if (Math.Pow(2, i) <= Znak.takt_delka)
+                if (Math.Pow(2, i) <= takt)
                 {
                     tmp_delka = i;
                     i = -1;
@@ -251,7 +254,7 @@ public class Hand_Ctrl : MonoBehaviour
             int tmp_delka = 1;
             for (int i = 4; i > -1; i--)
             {
-                if (Math.Pow(2, i) <= Znak.takt_delka)
+                if (Math.Pow(2, i) <= takt)
                 {
                     tmp_delka = i;
                     i = -1;
@@ -566,9 +569,22 @@ public class Hand_Ctrl : MonoBehaviour
         hands = new Holder[data[0]];
         predznamenani = data[1];
         takt = data[2];
+        int tmp = takt / 2;
+        if (tmp % 2 == 1)
+        {
+            takt_bot.GetComponent<Text>().text = "8";
+            takt_top.GetComponent<Text>().text = tmp.ToString();
+        }
+        else
+        {
+            takt_bot.GetComponent<Text>().text = "4";
+            takt_top.GetComponent<Text>().text = (tmp/2).ToString();
+
+        }
         for (int i = 0; i < data[0]; i++)
         {
             hands[i] = new Holder();
+            hands[i].klic = data[i + 3];
             hands[i].id = i;
             Add_line(hands[i]);
             Add_Nota(hands[i]);
@@ -584,13 +600,15 @@ public class Hand_Ctrl : MonoBehaviour
         GameObject end = Instantiate(proto_end, paper.transform, false);
         end.gameObject.name = "end " + hold.linek + " " + hold.id;
         GameObject pred;
-        if (hold.klic == 1)
+        if (hold.klic == 0)
         {
             pred = Instantiate(proto_pred_h, paper.transform, false);
+            klic.GetComponent<Image>().sprite = Znak.Gfx.H_klic;
         }
         else
         {
             pred = Instantiate(proto_pred_b, paper.transform, false);
+            klic.GetComponent<Image>().sprite = Znak.Gfx.B_klic;
         }
         pred.GetComponent<Predznamenani>().Activate(predznamenani);
         pred.gameObject.name = "pred " + hold.linek + " " + hold.id;
@@ -639,7 +657,7 @@ public class Hand_Ctrl : MonoBehaviour
             Holder hold = target.master;
             while (target != null)
             {
-                target.Calc_Pos(true);
+                target.Bump_pos();
                 target.Update_delka();
                 target = target.Next;
             }
@@ -656,7 +674,7 @@ public class Hand_Ctrl : MonoBehaviour
     public void Do_Takty(Holder hold)
     {
         int mod = Znak.takts_per_line + 1;
-        float Dist_t = hold.Posledni.Dist_x / Znak.takt_delka;  // vzdalenost od prevni noty v taktech
+        float Dist_t = hold.Posledni.Dist_x / takt;  // vzdalenost od prevni noty v taktech
         if (Dist_t > hold.last_x)
         {
             for (int i = (int)Math.Floor(hold.last_x)+ 1; i < (int)Math.Floor(Dist_t) + 1; i++)
@@ -672,7 +690,7 @@ public class Hand_Ctrl : MonoBehaviour
                     {
                         hold.selected.takty[(modulo) - 1] = Instantiate(proto_takt, hold.selected.transform, false);
                         hold.selected.takty[(modulo) - 1].SetActive(true);
-                        hold.selected.takty[(modulo) - 1].transform.position = hold.selected.end.transform.position + new Vector3(-(6 - modulo) * Znak.takt_width, 0);
+                        hold.selected.takty[(modulo) - 1].transform.position =new Vector3(proto_nota.transform.position.x + (modulo) * Znak.takt_width + modulo * Znak.cara_width - 40f, hold.selected.transform.position.y);
                     }
                 }
                 else
@@ -738,7 +756,7 @@ public class Holder
     public Line_Ctrl last;
 
     public float last_x = 0;
-    public int klic = 1;//(1 = houslovy, 0 = bassovy)
+    public int klic = 1;//(0 = houslovy, 1 = bassovy)
     
 }
 

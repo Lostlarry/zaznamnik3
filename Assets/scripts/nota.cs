@@ -10,12 +10,12 @@ public class Znak : MonoBehaviour
     public static Hand_Ctrl CTRL;
     public static Vector3 ref_point;
 
-    public static int takts_per_line = 5;// nevissi id takze taktu je o jedna vic
+    public static int takts_per_line = 4;// nevissi id takze taktu je o jedna vic
     public static float takt_width = 79.2f;
-    public static float takt_delka = 16f;
+    public static float cara_width = 8f;
     public const float nota_height = 3.7f;
 
-    protected int delka = 4; // exponent 2 vzdy zaporne (2 na -2 je 1/4, atd.)
+    protected int delka = 4; // exponent 2 (2 na 2 je 4(v sestnactnach), atd.)
     protected int postfix = 0;// 0 = nic 1 az 3 = mnozsti tecek delka s teckama = (delka * (2^-pocet tecek))
 
     public Holder master;
@@ -72,9 +72,9 @@ public class Znak : MonoBehaviour
 
     public void Update_delka()
     {
-        if ((dist_x % takt_delka + Math.Pow(2, delka) * (2 - Math.Pow(2, -postfix))) > takt_delka)
+        if ((dist_x % CTRL.takt + Math.Pow(2, delka) * (2 - Math.Pow(2, -postfix))) > CTRL.takt)
         {
-            Adapt(takt_delka - dist_x % takt_delka);
+            Adapt(CTRL.takt - dist_x % CTRL.takt);
             Do_lig();
         }
     }
@@ -142,18 +142,14 @@ public class Znak : MonoBehaviour
         Delka = Z.Delka;
     }
 
-    public virtual void Calc_Pos(bool update = false)
+    public virtual void Calc_Pos()
     {
-        if (update)
-        {
-            Bump_pos();
-        }
         int mod = 0;
         if (hand_id > 0)
         {
             mod = hand_id - 1 + pos_y;
         }
-        gameObject.transform.position = ref_point + new Vector3((Pos_x * takt_width), (pos_y + mod) * Hand_Ctrl.vyska_linek, 0);
+        gameObject.transform.position = ref_point + new Vector3((Pos_x * takt_width) + (float)Math.Floor(pos_x) * cara_width, (pos_y + mod) * Hand_Ctrl.vyska_linek, 0);
     }
 
     public void Swap_Pos(Znak target)
@@ -258,8 +254,9 @@ public class Znak : MonoBehaviour
     { 
         bool output = false;
         double mod = Math.Pow(2, prev.Delka) * (2 - Math.Pow(2, -prev.postfix));
+        Pos_y = prev.pos_y;
         dist_x = prev.dist_x + (float)mod;
-        pos_x = prev.pos_x + (float)mod / takt_delka;
+        pos_x = prev.pos_x + (float)mod / CTRL.takt;
         if (Pos_x > takts_per_line)
         {
             pos_x = 0;
@@ -312,18 +309,14 @@ public class Nota : Znak
     int prefix = 0;// 0= nic 1 = krizky 2 = becka 3 = cista 
     int topfix = 0;// 0 = nic 1 
 
-    public override void Calc_Pos(bool update = false)
+    public override void Calc_Pos()
     {
-        if (update)
-        {
-            Bump_pos();
-        }
         int mod = 0;
         if (hand_id > 0)
         {
             mod = hand_id - 1 + pos_y;
         }
-        gameObject.transform.position = ref_point + new Vector3(Pos_x * takt_width, (pos_y + mod) * Hand_Ctrl.vyska_linek + vyska * nota_height, 0);
+        gameObject.transform.position = ref_point + new Vector3(Pos_x * takt_width + (float)Math.Floor(pos_x) * cara_width, (pos_y + mod) * Hand_Ctrl.vyska_linek + vyska * nota_height, 0);
         //prevraceni
         if (vyska > 1)
         {

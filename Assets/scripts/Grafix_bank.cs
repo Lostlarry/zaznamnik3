@@ -21,6 +21,9 @@ public class Grafix_bank : MonoBehaviour
     public Sprite P_osmina;
     public Sprite P_sestnactina;
 
+    public Sprite B_klic;
+    public Sprite H_klic;
+
     // Start is called before the first frame update
     void Start()
     {
