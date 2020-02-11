@@ -6,6 +6,8 @@ using UnityEngine;
 
 public class Save_Load : MonoBehaviour
 {
+    public Screen_Ctrl SCR_ctrl;
+
     void Start() { }
     void Update() { }
 
@@ -21,6 +23,7 @@ public class Save_Load : MonoBehaviour
             TextWriter writer = new StreamWriter(savefile, false);
             writer.WriteLine(output);
             writer.Close();
+            SCR_ctrl.log_save(3);// file saved
             return true;
         }
         return false;
@@ -35,7 +38,12 @@ public class Save_Load : MonoBehaviour
             TextReader reader = new StreamReader(savefile);
             input = reader.ReadLine();
             reader.Close();
+            SCR_ctrl.log_save(2);// loading file
             return true;
+        }
+        else
+        {
+            SCR_ctrl.log_save(1);// no file detected
         }
         return false;
     }

@@ -6,45 +6,45 @@ using UnityEngine.UI;
 
 public class Change_ctrl : MonoBehaviour
 {
-    public Hand_Ctrl CTRL;
+    public Hand_Ctrl CTRL; // dulezite pro pristup k prototypum
 
-    Znak target_note;
+    Znak target_note; // nota kerou modifikujeme
 
-    public Button[] vyska_buttons;
-    public InputField Vyska_txt;
+    public Button[] vyska_buttons; // tlacitka na modifikaci vysky potrebujemeje abychom je mohly vypnou kdyz pracujeme s pomlkou
+    public InputField Vyska_txt;// textova pola vstup i vystup
     public InputField Delka_txt;
     public InputField postfix_txt;
-    public Predznamenani pred;
-    public GameObject klic;
+    public Predznamenani pred;// predznamenani v change menu kopije z mastru cilove noty
+    public GameObject klic;// klic to same jako predznamenani
 
-    public Toggle pomlka;
+    public Toggle pomlka; // prepinani nezi notou a pomlkou
     public Toggle nota;
-    bool swaping = false;
+    bool swaping = false; // dulezite pro manipulaci s toggly
 
-    public Toggle[] prefix;
+    public Toggle[] prefix; // pole objekt prefixu
 
-    public Nota_ProtoType prototype;
+    public Nota_ProtoType prototype;  // prototyp multifunkcni noty
 
-    public void Mod_vyska(int Change)
+    public void Mod_vyska(int Change)// zmeni vysku o dane monozstvi    spousteno tlacitky v menu
     {
         prototype.Vyska = prototype.Vyska + Change;
         Vyska_txt.text = prototype.Vyska.ToString();
         Control_prefix();
     }
 
-    public void Input_vyska(string Target_vyska)
+    public void Input_vyska(string Target_vyska) // zmeni vysku na uzivatelem napsanou hodnotu volano z Vyska_txt
     {
         prototype.Vyska = int.Parse(Target_vyska);
         Control_prefix();
     }
 
-    public void Mod_delka(int Change)
+    public void Mod_delka(int Change)// zmeni vysku o dane monozstvi    spousteno tlacitky v menu
     {
         prototype.Delka = prototype.Delka + Change;
         Delka_txt.text = Math.Pow(2, prototype.Delka).ToString();
     }
 
-    public void Input_delka(string Target_delka)
+    public void Input_delka(string Target_delka)// zmeni vysku na uzivatelem napsanou hodnotu volano z Delka_txt
     {
         if (int.TryParse(Target_delka, out int output))
         {
@@ -57,7 +57,7 @@ public class Change_ctrl : MonoBehaviour
     {
         if (!swaping)
         {
-            swaping = true;// we are modifing isOn value of the toggles which will triger this fucntion
+            swaping = true;// modifikujeme isOn hodnotu togglu ktere spousteji tuto funkci takze se musime ujistit ze se vykona je jednou
             nota.isOn = is_nota;
             pomlka.isOn = !is_nota;
             prototype.Nota = is_nota;
@@ -71,7 +71,7 @@ public class Change_ctrl : MonoBehaviour
         }
     }
 
-    public void Input_prefix(int index)
+    public void Input_prefix(int index)// zmeni prefix v zavislosti na vstupu  aktivnizadny nebo pouze jeden ze vstupu
     {
         if (!swaping)
         {
@@ -93,7 +93,7 @@ public class Change_ctrl : MonoBehaviour
         }
     }
 
-    public void Set_data(Znak target)
+    public void Set_data(Znak target)// zkopiruje data ciloveho znaku a upracy UI
     {
         if (!swaping)
         {
@@ -101,7 +101,6 @@ public class Change_ctrl : MonoBehaviour
             target_note = target;
             Vector3 pos = pred.transform.position;
             Destroy(pred.gameObject);
-            Destroy(pred);
             if (target_note.master.klic == 0)
             {
                 pred = Instantiate(CTRL.proto_pred_h, transform, false).GetComponent<Predznamenani>();
@@ -133,7 +132,7 @@ public class Change_ctrl : MonoBehaviour
         }
     }
 
-    public void Send_data()
+    public void Send_data() // posle data a upravy cilovy znak
     {
         if (target_note.is_nota() != prototype.Nota)
         {
@@ -142,7 +141,7 @@ public class Change_ctrl : MonoBehaviour
         target_note.Paste(prototype.Send());
     }
 
-    public void Control_prefix()
+    public void Control_prefix() // zabrani nekterym prefixum aby byli zvoleny
     {
         if (!swaping)
         {
@@ -176,13 +175,13 @@ public class Change_ctrl : MonoBehaviour
         swaping = false;
     }
 
-    public void Mod_postfix(int Change)
+    public void Mod_postfix(int Change)  //modifikuje postfix o change volano tlacitky
     {
         prototype.Postfix = prototype.Postfix + Change;
         postfix_txt.text = prototype.Postfix.ToString();
     }
 
-    public void Input_postfix(string Target_delka)
+    public void Input_postfix(string Target_delka)// zadani postfixu od uzivatele
     {
         if (int.TryParse(Target_delka, out int output))
         {
@@ -190,17 +189,7 @@ public class Change_ctrl : MonoBehaviour
         }
         postfix_txt.text = prototype.Postfix.ToString();
     }
-
-
-
-    // Start is called before the first frame update
-    void Start()
-    {
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    
+    void Start() { }
+    void Update() { }
 }

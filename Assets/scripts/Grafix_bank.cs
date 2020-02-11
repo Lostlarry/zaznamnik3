@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Grafix_bank : MonoBehaviour
+public class Grafix_bank : MonoBehaviour//drzi odkazi na sprity pouzivane jinymi clasamy aby tama nebyla tuna kodu
 {
     public Sprite Prefix_krizek;
     public Sprite Prefix_becko;
@@ -24,16 +24,11 @@ public class Grafix_bank : MonoBehaviour
     public Sprite B_klic;
     public Sprite H_klic;
     public Sprite Lig_left;
-
-    // Start is called before the first frame update
+   
     void Start()
     {
         Znak.Gfx = this;
     }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    
+    void Update(){ }
 }

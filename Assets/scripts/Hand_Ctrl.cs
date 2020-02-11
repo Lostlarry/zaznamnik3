@@ -5,17 +5,17 @@ using UnityEngine.UI;
 
 public class Hand_Ctrl : MonoBehaviour
 {
-    public const float vyska_linek = -48.6f;
+    public const float vyska_linek = -48.6f; // vz
 
-    public HUD_ctrl Select_HUD;
-    public HUD_ctrl End_HUD;
-    public GameObject paper;
-    public GameObject takt_top;
-    public GameObject takt_bot;
+    public HUD_ctrl Select_HUD;// menu okolo zvolene noty
+    public HUD_ctrl End_HUD; // menu na tvorbu nove noty
+    public GameObject paper;  // objekt ktery je parrentem vsemnotam a linkam
+    public GameObject takt_top; // horni cislice taktu
+    public GameObject takt_bot; // dolni cislice taktu
 
-    public GameObject proto_nota;
-    public GameObject proto_linka;
-    public GameObject proto_klic;
+    public GameObject proto_nota;    // prototypy game objektu ktery jesou zkopirovany kdyz je potrebujeme
+    public GameObject proto_linka;  
+    public GameObject proto_klic; 
     public GameObject proto_end;
     public GameObject proto_pred_h;
     public GameObject proto_pred_b;
@@ -23,21 +23,21 @@ public class Hand_Ctrl : MonoBehaviour
     public GameObject proto_lig;
     public GameObject proto_lig_side;
 
-    static GameObject decoy_linka;
+    static GameObject decoy_linka;//kopije prototypu abychom nemusely kopirovat vsechny prototypy  pouzito pri nacitani
     static GameObject decoy_nota;
     static HUD_ctrl decoy_HUD;
     static GameObject decoy_paper;
     static GameObject decoy_takt;
     static GameObject decoy_pred;
 
-    public Holder[] hands;
+    public Holder[] hands; // holder pro kazdou ruku  ale druha ruka je vypnuta takze vice mene na nic
 
-    int selected_hand = 0;
+    int selected_hand = 0;  // vybrna ruka
 
     public int predznamenani = 0; //0 = cdur kladny jsou krizky, zaporny jsou becka
-    public int takt = 1;
+    public int takt = 16; // delka taktu
 
-    public string Give_String()
+    public string Give_String()// transformuje vsechny data do stringu
     {
         string dat = "";
         for (int i = hands.GetLength(0) - 1; i >= 0; i--)
@@ -175,22 +175,26 @@ public class Hand_Ctrl : MonoBehaviour
         {
             errors[0] = true;
         }
+        for (int i = 0; i < hands.GetLength(0); i++)
+        {
+            Recalc(hands[i].Prvni);
+        }
         return this;
     }
 
-    public Nota Add_Nota(Holder hand, Znak target = null, int input_delka = -1, float adapt = -1)
+    public Nota Add_Nota(Holder hand, Znak target = null, float adapt = -1)// vytvori novu notu dane ruce(hand), za danou notou (nebo za posledni notou pokud target je null) 
     {
-        if (hand == null)
+        if (hand == null)// nemelo by se to stat  ale pro pripad ze hand je null tak program nespadne
         {
             hand = hands[0];
         }
-        bool middle = true;
+        bool middle = true;// je true pokud se snazime dat do prostred not
         if (target == null)
         {
             target = hand.Posledni;
             middle = false;
         }
-        GameObject GO = Instantiate(proto_nota, paper.transform, false);
+        GameObject GO = Instantiate(proto_nota, paper.transform, false);// vytvori grafiku
         GO.name = "nota " + hand.not + " " + hand.id;
         GO.SetActive(true);
         hand.not++;
@@ -198,31 +202,24 @@ public class Hand_Ctrl : MonoBehaviour
         made.Do_data();
         made.master = hand;
         made.Hand_id = hands.GetLength(0) - 1 + hand.id;
-        if (adapt < 0)
+        if (adapt < 0)//priradi delku
         {
-            if (input_delka == -1)
+            int tmp_delka = 1;
+            for (int i = 4; i > -1; i--)
             {
-                int tmp_delka = 1;
-                for (int i = 4; i > -1; i--)
+                if (Math.Pow(2, i) <= takt)
                 {
-                    if (Math.Pow(2, i) <= takt)
-                    {
-                        tmp_delka = i;
-                        i = -1;
-                    }
+                    tmp_delka = i;
+                    i = -1;
                 }
-                made.Delka = tmp_delka;
             }
-            else
-            {
-                made.Delka = input_delka;
-            }
+            made.Delka = tmp_delka;
         }
         else
         {
             made.Adapt(adapt, true);
         }
-        if (target != null)
+        if (target != null)// prida nove vytvorenou notu do odkazoveho seznamu
         {
             if (middle && target.Next != null)
             {
@@ -243,14 +240,14 @@ public class Hand_Ctrl : MonoBehaviour
             hand.Posledni = made;
             made.Calc_Pos();
         }
-        made.Update_delka();
+        made.Update_delka();// udela upravy  jako napr. taktove cary a posu HUDu
         hand.vybrany = made;
         Select_hand(hand);
         Select_HUD.Adjust_HUD(made);
         return made;
     }
 
-    public Pomlka Add_Pomlka(Holder hand, Znak target = null, int input_delka = -1, float adapt = -1)
+    public Pomlka Add_Pomlka(Holder hand, Znak target = null, float adapt = -1) // to same jako predchozi ale vytavrime pomlku
     {
         if (hand == null)
         {
@@ -271,23 +268,16 @@ public class Hand_Ctrl : MonoBehaviour
         made.Hand_id = hands.GetLength(0) - 1 + hand.id;
         if (adapt < 0)
         {
-            if (input_delka == -1)
+            int tmp_delka = 1;
+            for (int i = 4; i > -1; i--)
             {
-                int tmp_delka = 1;
-                for (int i = 4; i > -1; i--)
+                if (Math.Pow(2, i) <= takt)
                 {
-                    if (Math.Pow(2, i) <= takt)
-                    {
-                        tmp_delka = i;
-                        i = -1;
-                    }
+                    tmp_delka = i;
+                    i = -1;
                 }
-                made.Delka = tmp_delka;
             }
-            else
-            {
-                made.Delka = input_delka;
-            }
+            made.Delka = tmp_delka;
         }
         else
         {
@@ -321,12 +311,12 @@ public class Hand_Ctrl : MonoBehaviour
         return made;
     }
 
-    private void Select_hand(int i)
+    private void Select_hand(int i)// zvoli ruku o danem id
     {
-        selected_hand = i;// used by reset only so its fine
+        selected_hand = i;// pouzivato jenom reset takze to je v pohode
     }
 
-    private void Select_hand(Holder hold)
+    private void Select_hand(Holder hold)// vybere dany holder pouzivano k najiti holderu z mastra znaku
     {
         for (int i = 0; i < hands.GetLength(0); i++)
         {
@@ -347,12 +337,12 @@ public class Hand_Ctrl : MonoBehaviour
 
     }
 
-    public void Relay_signal(int cmd_id)
+    public void Relay_signal(int cmd_id)//prijma signal od HUDu
     {
         switch (cmd_id)
         {
             case 1:
-                hands[selected_hand].vybrany.Nota_Up();
+                hands[selected_hand].vybrany.Nota_Up(); // moznosti 1 az 4 nejsou pouzity
                 break;
             case 2:
                 hands[selected_hand].vybrany.Nota_Down();
@@ -371,7 +361,7 @@ public class Hand_Ctrl : MonoBehaviour
             case 6:
                 Shift_prev();
                 break;
-            case 7://not in use
+            case 7://metoda change je pouzita ale ne volana odtud
                 Change();
                 break;
             case 8:
@@ -395,10 +385,10 @@ public class Hand_Ctrl : MonoBehaviour
         }
     }
 
-    private void Shift_prev(Znak target = null)
+    private void Shift_prev(Znak target = null)// vymeni notu s tou pred ni
     {
         bool lig = false;
-        if (target.Lig_next != null)
+        if (target.Lig_prev != null)
         {
             lig = true;
         }
@@ -409,7 +399,7 @@ public class Hand_Ctrl : MonoBehaviour
         Znak swap = target.Prev;
         if (swap != null)
         {
-            swap.Next = target.Next;
+            swap.Next = target.Next;// prehodi objekty v retezci
             target.Next = swap;
             target.Prev = swap.Prev;
             swap.Prev = target;
@@ -431,7 +421,7 @@ public class Hand_Ctrl : MonoBehaviour
             }
             target.Swap_Pos(swap);
         }
-        Recalc(target);
+        Recalc(target);// prepocita pozice takty a hud
         Do_Takty(target.master);
         Select_HUD.Adjust_HUD(target);
         if (lig)
@@ -440,7 +430,7 @@ public class Hand_Ctrl : MonoBehaviour
         }
     }
 
-    private void Shift_next(Znak target = null)
+    private void Shift_next(Znak target = null)// stejny jako predchozi fce ale vymenujeme s predchozim znakem
     {
         bool lig = false;
         if (target.Lig_next != null)
@@ -485,7 +475,7 @@ public class Hand_Ctrl : MonoBehaviour
         }
     }
 
-    private void Remove(Znak target = null)
+    private void Remove(Znak target = null)//odstranime vybranou notu
     {
         if (target == null)
         {
@@ -521,7 +511,7 @@ public class Hand_Ctrl : MonoBehaviour
             Add_Nota(hold);
         }
         Destroy(target.gameObject);
-        if (hold.Prvni == null)
+        if (hold.Prvni == null)// pokud jsme smazali posledni notu na radku takvytorime novou jinak se kod zblazni
         {
             Add_Nota(hold);
         }
@@ -530,7 +520,7 @@ public class Hand_Ctrl : MonoBehaviour
         End_HUD.Adjust_HUD(hold.Posledni);
     }
 
-    public Znak Change(Znak target = null)
+    public Znak Change(Znak target = null)// za meni notu za pomlku a obracene
     {
         if (target == null)
         {
@@ -545,7 +535,7 @@ public class Hand_Ctrl : MonoBehaviour
         {
             made = target.gameObject.AddComponent<Nota>();
         }
-        made.Load(target);
+        made.Load(target);//zavola vsechny dulezite fce
         made.Calc_Pos();
         made.Update_gfx();
         Select_HUD.Adjust_HUD(made);
@@ -554,7 +544,7 @@ public class Hand_Ctrl : MonoBehaviour
         return made;
     }
 
-    public void Reset(int[] data)
+    public void Reset(int[] data)//smaze vsechny noty a linky a nacte z pole data
     {
         Select_hand(0);
         predznamenani = 0;
@@ -596,7 +586,7 @@ public class Hand_Ctrl : MonoBehaviour
         Create(data);
     }
 
-    public void Reset()
+    public void Reset()// smaze vsechny linky a noty
     {
         if (hands != null)
         {
@@ -633,7 +623,7 @@ public class Hand_Ctrl : MonoBehaviour
         }
     }
 
-    public void Create(int[] data)
+    public void Create(int[] data)// vyvori novy projekt s jenim radkem a notou pro kazdou ruku
     {
         hands = new Holder[data[0]];
         predznamenani = data[1];
@@ -658,7 +648,7 @@ public class Hand_Ctrl : MonoBehaviour
             Add_Nota(hands[i]);
         }
     }
-    public void Create(int hand_count)
+    public void Create(int hand_count)// zjednodusena verze predchozi methody pouzita pri nacitani
     {
         hands = new Holder[hand_count];
         int tmp = takt / 2;
@@ -681,7 +671,7 @@ public class Hand_Ctrl : MonoBehaviour
         }
     }
 
-    void Add_line(Holder hold)
+    void Add_line(Holder hold)// prida novou linku vcetne klic zakonceni a predznamenani
     {
         GameObject novy = Instantiate(proto_linka, paper.transform, false);
         novy.gameObject.name = "linka " + hold.linek + " " + hold.id;
@@ -738,7 +728,7 @@ public class Hand_Ctrl : MonoBehaviour
         Znak.CTRL = this;
         if (proto_nota != null)
         {
-            Znak.ref_point = proto_nota.transform.position;
+            Znak.ref_point = proto_nota.transform.position;//pri nacitani Hand_ctrl nexistule dost dlouho aby udelal v tomhle zmatek
             decoy_linka = proto_linka;
             decoy_nota = proto_nota;
             decoy_HUD = Select_HUD;
@@ -749,7 +739,7 @@ public class Hand_Ctrl : MonoBehaviour
     }
     void Update() { }
 
-    public void Load_decoys()
+    public void Load_decoys()// nacte prototypy z decoyu
     {
         Znak.CTRL = this;
         Select_HUD = decoy_HUD;
@@ -769,7 +759,7 @@ public class Hand_Ctrl : MonoBehaviour
         proto_lig_side = decoy_linka;
     }
 
-    public void Recalc(Znak target)
+    public void Recalc(Znak target)// prepocita pozici kazde noty pocinaje tou zadanou
     {
         if (target != null)
         {
@@ -780,23 +770,24 @@ public class Hand_Ctrl : MonoBehaviour
                 target.Update_delka();
                 target = target.Next;
             }
+            Do_Takty(hold);
             End_HUD.Adjust_HUD(hold.Posledni);
         }
 
     }
 
-    public Znak get_selected()
+    public Znak get_selected() // vybere danou notu
     {
         return hands[selected_hand].vybrany;
     }
 
-    public void Do_Takty(Holder hold)
+    public void Do_Takty(Holder hold) // spocita takty
     {
         int mod = Znak.takts_per_line + 1;
-        float Dist_t = hold.Posledni.Dist_x / takt;  // vzdalenost od prevni noty v taktech
-        if (Dist_t > hold.last_x)
+        float Pos_t = hold.Posledni.Pos_x;  // vzdalenost od prevni noty v taktech
+        if (Pos_t > hold.last_x)
         {
-            for (int i = (int)Math.Floor(hold.last_x) + 1; i < (int)Math.Floor(Dist_t) + 1; i++)
+            for (int i = (int)Math.Floor(hold.last_x) + 1; i < (int)Math.Floor(Pos_t) + 1; i++)
             {
                 int modulo = i % mod;
                 if (modulo != 0)
@@ -830,9 +821,9 @@ public class Hand_Ctrl : MonoBehaviour
                 }
             }
         }
-        else if (Dist_t < hold.last_x)
+        else if (Pos_t < hold.last_x)
         {
-            for (int i = (int)Math.Floor(hold.last_x); i > (int)Math.Floor(Dist_t) - 1; i--)
+            for (int i = (int)Math.Floor(hold.last_x); i > (int)Math.Floor(Pos_t) - 1; i--)
             {
                 int modulo = i % mod;
                 if (modulo != 0)
@@ -856,7 +847,7 @@ public class Hand_Ctrl : MonoBehaviour
                 }
             }
         }
-        hold.last_x = Dist_t;
+        hold.last_x = Pos_t;
     }
 
     public GameObject get_lig(int state, Znak target)

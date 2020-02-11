@@ -6,32 +6,34 @@ using UnityEngine.UI;
 
 public class Znak : MonoBehaviour
 {
-    public static Grafix_bank Gfx;
+    public static Grafix_bank Gfx;// odkaz na uloziste spritu
     public static Hand_Ctrl CTRL;
-    public static Vector3 ref_point;
+    public static Vector3 ref_point;// pozice prvni noty (prvni nota na prvnim radku   tedy pos_x = 0, pos_y = 0) 
 
     public static int takts_per_line = 4;// nevissi id takze taktu je o jedna vic
-    public static float takt_width = 79.2f;
-    public static float cara_width = 8f;
-    public const float nota_height = 3.7f;
+    public static float takt_width = 79.2f;// vzdalenos prvni noty od konce taktu
+    public static float cara_width = 8f; // sirka vyhrazena pro taktovou caru
+    public const float nota_height = 3.7f; // vzdalenost noty o jedna vyssi podle osi x
 
-    protected int delka = 4; // exponent 2 (2 na 2 je 4(v sestnactnach), atd.)
-    protected int postfix = 0;// 0 = nic 1 az 3 = mnozsti tecek delka s teckama = (delka * (2^-pocet tecek))
+    protected int delka = 4; // exponent 2 (2 na 4 je 16 (v sestnactnach) tj cely ctyr ctvrtovy takt, atd.)
+    protected int postfix = 0;// 0 = nic 1 az 3 = mnozsti tecek delka s teckama = (delka * (2-2^-pocet tecek))   kazda tecka pridava pulku delky te predchozi (nebo noty v pripade prvni tecky) 
 
     public Holder master;
 
-    protected Znak prev;
-    protected Znak next;
+    protected Znak prev; // predchozi a dalsi Znak pro navigaci 
+    protected Znak next; // ukazuje na Znaky pro stejnou ruku
 
-    protected GameObject lig_next;
+    protected GameObject lig_next; // odkaz na ligaturu s dalsi notou
     protected GameObject lig_prev;
+    protected GameObject[] postfix_GO; //pole odkazu na na posfix (tecky)
 
-    protected float pos_x = 0;
-    protected float dist_x = 0;
-    protected int pos_y = 0;
-    protected int hand_id = 0;
+    protected float pos_x = 0; // Vzdalenost od prvniho znaku na radky v taktech
+    protected int pos_y = 0; // id radku na kterem je tento znak
+    protected int hand_id = 0; // dulezite por modifikace v dusledku vice rukou
 
-    public Znak Prev { get => prev; set => prev = value; }
+    // gettery a seetery
+
+    public Znak Prev { get => prev; set => prev = value; } 
     public Znak Next { get => next; set => next = value; }
 
     public float Pos_x
@@ -42,7 +44,7 @@ public class Znak : MonoBehaviour
         }
         set
         {
-            if (pos_x != value)
+            if (pos_x != value) // minimalizuje pocet volani DOtakty funkace
             {
                 pos_x = value;
                 CTRL.Do_Takty(master);
@@ -51,10 +53,28 @@ public class Znak : MonoBehaviour
     }
 
     public int Pos_y { get => pos_y; set => pos_y = value; }
-    public virtual int Postfix { get { return 0; } set { } }
+    public int Postfix
+    {
+        get => postfix;
+        set
+        {
+            if (value < 0)// zajisti ze nepocitame se silene detajlnimi daty
+            {
+                postfix = 0;
+            }
+            else if (value > 3)
+            {
+                postfix = 3;
+            }
+            else
+            {
+                postfix = value;
+            }
+        }
+    }
+
 
     public int Hand_id { get => hand_id; set => hand_id = value; }
-    public float Dist_x { get => dist_x; set => dist_x = value; }
     public int Delka
     {
         get
@@ -64,7 +84,7 @@ public class Znak : MonoBehaviour
         set
         {
             delka = value;
-            if (Delka < 0)
+            if (Delka < 0)// zajisti ze nepocitame se silene detajlnimi daty
             {
                 Delka = 0;
             }
@@ -86,19 +106,19 @@ public class Znak : MonoBehaviour
 
     public void Update_delka()
     {
-        if ((pos_x % 1 * CTRL.takt + Math.Pow(2, delka) * (2 - Math.Pow(2, -postfix))) > CTRL.takt)
+        if ((pos_x % 1 * CTRL.takt + Math.Pow(2, delka) * (2 - Math.Pow(2, -postfix))) > CTRL.takt)// soucet delek not v tomto taktu + delka teto noty > delka jednoho taktu
         {
             Adapt(CTRL.takt - pos_x % 1 * CTRL.takt);
             Do_lig();
         }
     }
 
-    public void Adapt(float input, bool made = false)
+    public void Adapt(float input, bool made = false)// input = cilova delka teto noty, made = true pokud volano z teto funkce
     { 
         float rem_input = input;
         int tmp_delka = -1;
         int targ_post = 0;
-        for (int i = 4; i > -1; i--)
+        for (int i = 4; i > -1; i--)// pokusi se vytvorit co nejvetsi notu nizsi nez input
         {
             if (Math.Pow(2, i) <= rem_input)
             {
@@ -119,29 +139,29 @@ public class Znak : MonoBehaviour
             }
         }
         bool shifted = false;
-        if (rem_input > 0)
+        if (rem_input > 0)// pokud se nepodarilo vytvorit notu o delky input
         {
             if (is_nota())
             {
-                CTRL.Add_Nota(master, this, 1, rem_input);
+                CTRL.Add_Nota(master, this, rem_input);
             }
             else
             {
-                CTRL.Add_Pomlka(master, this, 1, rem_input);
+                CTRL.Add_Pomlka(master, this, rem_input);
             }
             shifted = true;
         }
         Znak target = this;
         int Ex_delka = delka;
         int Ex_postfix = postfix;
-        if (made)
+        if (made) //pokud byla nota vyvorena touto funkci tak jeji puvodni delka je irelevantni
         {
             Ex_delka = tmp_delka;
             Ex_postfix = targ_post;
         }
         delka = tmp_delka;
         postfix = targ_post;
-        if (Math.Pow(2, Ex_delka) * (2 - Math.Pow(2, -Ex_postfix)) > input)
+        if (Math.Pow(2, Ex_delka) * (2 - Math.Pow(2, -Ex_postfix)) > input)// 
         {
             if (shifted)
             {
@@ -149,17 +169,17 @@ public class Znak : MonoBehaviour
             }
             if (is_nota())
             {
-                CTRL.Add_Nota(master, target, 1, (float)(Math.Pow(2, Ex_delka) * (2 - Math.Pow(2, -Ex_postfix)) - input));
+                CTRL.Add_Nota(master, target, (float)(Math.Pow(2, Ex_delka) * (2 - Math.Pow(2, -Ex_postfix)) - input));
             }
             else
             {
-                CTRL.Add_Pomlka(master, target, 1, (float)(Math.Pow(2, Ex_delka) * (2 - Math.Pow(2, -Ex_postfix)) - input));
+                CTRL.Add_Pomlka(master, target, (float)(Math.Pow(2, Ex_delka) * (2 - Math.Pow(2, -Ex_postfix)) - input));
             }
         }
         Update_gfx();
     }
 
-    public void Load(Znak Z)
+    public void Load(Znak Z)// nacte data z jineha znaku  pouzito pouze pri zmene noty na pomlku a obracene
     {
         delka = Z.delka;
         master = Z.master;
@@ -177,25 +197,22 @@ public class Znak : MonoBehaviour
         Update_delka();
     }
 
-    public virtual void Calc_Pos()
+    public virtual void Calc_Pos() //spocita pozici Grafiky
     {
         int mod = 0;
         if (hand_id > 0)
         {
             mod = hand_id - 1 + pos_y;
-        }
+        }                                                         //delka not pred touto          //rezerva pro taktove cary
         gameObject.transform.position = ref_point + new Vector3((Pos_x * takt_width) + (float)Math.Floor(pos_x) * cara_width, (pos_y + mod) * Hand_Ctrl.vyska_linek, 0);
     }
 
-    public void Swap_Pos(Znak target)
+    public void Swap_Pos(Znak target) // zameni pozice dvou Znaku
     {
         float tmp_x = target.Pos_x;
         int tmp_y = target.pos_y;
-        float tmp_dist = target.dist_x;
-        target.dist_x = dist_x;
         target.pos_y = pos_y;
         target.Pos_x = Pos_x;
-        dist_x = tmp_dist;
         pos_y = tmp_y;
         Pos_x = tmp_x;
         Calc_Pos();
@@ -203,7 +220,7 @@ public class Znak : MonoBehaviour
     }
 
 
-    public virtual bool is_nota()
+    public virtual bool is_nota()//vrati true pokud toto je nota
     {
         return false;
     }
@@ -236,12 +253,12 @@ public class Znak : MonoBehaviour
         Update_gfx();
     }
 
-    public virtual string Give_String()
+    public virtual string Give_String()// vrati string ze ktereho nasledujici funkce vytovri objekt se stejnymi hodnotami  pouzito pri ukladani
     {
         return "Z,"+Delka+";";
     }
 
-    public virtual bool FromString(string input)
+    public virtual bool FromString(string input) //nastavy data ze vstutpu   vrati true pokud jsou data ve spatnem formatu
     {
         bool error = false;
         char[] filter = new char[1] { ',' };
@@ -268,11 +285,11 @@ public class Znak : MonoBehaviour
         return error;
     }
 
-    public virtual void Do_lig(bool prev = false)
+    public virtual void Do_lig(bool prev = false)// udela ligaturu s nalsedujici notou  delanic u vseho ostatniho
     {
     }
 
-    public void Transfer(Znak target)
+    public void Transfer(Znak target)// zkopiruje dulezita data z daneho Znaku
     {
         Prev = target.Prev;
         Next = target.Next;
@@ -286,19 +303,17 @@ public class Znak : MonoBehaviour
         }
         master = target.master;
         hand_id = target.hand_id;
-        dist_x = target.dist_x;
         pos_y = target.pos_y;
         Pos_x = target.Pos_x;
         Fix_lig();
         target.Fix_lig();
     }
 
-    public bool Bump_pos()
+    public bool Bump_pos()// vypocita svoji pozici v zavislosti na delace predchozi noty
     { 
         bool output = false;
         double mod = Math.Pow(2, prev.Delka) * (2 - Math.Pow(2, -prev.postfix));
         Pos_y = prev.pos_y;
-        dist_x = prev.dist_x + (float)mod;
         pos_x = prev.pos_x + (float)mod / CTRL.takt;
         if (Pos_x > takts_per_line)
         {
@@ -311,12 +326,12 @@ public class Znak : MonoBehaviour
         return output;
     }
 
-    public virtual int[] Copy()
+    public virtual int[] Copy()// vrati data jako pole integru pouzite v change menu
     {
         return new int[2] {0, Delka};
     }
 
-    public virtual void Paste(int[] input)
+    public virtual void Paste(int[] input) // zpracuje data z change menu udeatuje grafiku  vystup z change menu
     {
         if (input[0] == 0)
         {
@@ -330,7 +345,7 @@ public class Znak : MonoBehaviour
         Fix_lig();
     }
 
-    protected void Fix_lig()
+    protected void Fix_lig()//zkontroluje platnost ligatury
     {
         if (lig_prev != null)
         {
@@ -341,50 +356,30 @@ public class Znak : MonoBehaviour
             Do_lig();
         }
     }
-    public virtual void Update_gfx() { }
+    public virtual void Update_gfx() { }// matody ktery jsou overridly potomky
     public virtual void Do_data() { }
 
-    void Start() { }
+    void Start() { }// tyhle dve funkce jsou podnimkou MonoBehavoiur class (trid ktere jsou pripojene k objektu)
     void Update() { }
 }
 
 public class Nota : Znak
 {
     
-    GameObject prefix_GO;
-    GameObject topfix_GO;
-    GameObject[] postfix_GO;
+    GameObject prefix_GO;// game objekt reprezentujici prefix(krizek, becko nebo odrazka)
+    GameObject topfix_GO;// melo by to byt pouzite na statcato ale neni implemetovano
 
-    GameObject carka_licha;
-    GameObject carka_suda;
-    GameObject[] carky;
+    //pomocne carky pokud je nota mimo linkovani
+    GameObject carka_licha; // carka jdouci pod notou    pouzita kdyz vyska je licha
+    GameObject carka_suda; // carka jdouci notou    pouzita kdyz vyska je suda
+    GameObject[] carky;// pole vesch pomocnych carek ktere leze pouzit (neni limitovano lze jednoduse opravit)
 
-    GameObject[] prapor_GOs;
+    GameObject[] prapor_GOs; // odakazi napole prapru jsou pouse dva(pro osminy a sestnactiny)
     
-    int vyska = 0; // relativne ku spodni radce
+    int vyska = 0; // relativne ku 2. radce od spoda
 
     int prefix = 0;// 0= nic 1 = krizky 2 = becka 3 = cista 
-    int topfix = 0;// 0 = nic 1 
-
-    public override int Postfix
-    {
-        get => postfix;
-        set
-        {
-            if (value < 0)
-            {
-                postfix = 0;
-            }
-            else if (value > 3)
-            {
-                postfix = 3;
-            }
-            else
-            {
-                postfix = value;
-            }
-        }
-    }
+    int topfix = 0;// nepouzito
 
     public override GameObject Lig_next
     {
@@ -404,7 +399,7 @@ public class Nota : Znak
         }
     }
 
-    public override void Calc_Pos()
+    public override void Calc_Pos()// vypocita pozici noty a prevratiji pokud je nad polovinou linkovani
     {
         int mod = 0;
         if (hand_id > 0)
@@ -428,7 +423,7 @@ public class Nota : Znak
         Fix_lig();
     }
 
-    public override void Nota_Up(int i = 1)
+    public override void Nota_Up(int i = 1)// zvysi notu o i nepouzito
     {
         vyska = i + vyska;
         Calc_Pos();
@@ -440,17 +435,17 @@ public class Nota : Znak
         Calc_Pos();
     }
 
-    public override string Give_String()
+    public override string Give_String()// vreati string pro ukladani  
     {
-        return "N,"+Delka+","+vyska+","+prefix+","+postfix+","+(lig_prev!=null)+";";
+        return "N,"+Delka+","+vyska+","+prefix+","+postfix+","+(lig_prev!=null)+";"; 
     }
 
-    public override bool is_nota()
+    public override bool is_nota()// tohle je nota takze vrati true
     {
         return true;
     }
 
-    public override bool FromString(string input)
+    public override bool FromString(string input)// ziska data ze stringu vrati true pokud byl format spatne
     {
         bool error = false;
         char[] filter = new char[1] { ',' };
@@ -514,12 +509,12 @@ public class Nota : Znak
         }
         return error;
     }
-    public override int[] Copy()
+    public override int[] Copy()// data posilana do change menu
     {
         return new int[6] {2, Delka, postfix, prefix, topfix, vyska};
     }
 
-    public override void Paste(int[] input)
+    public override void Paste(int[] input)// zpracovani dat z change menu
     {
         if (input[0] == 2)
         {
@@ -536,7 +531,7 @@ public class Nota : Znak
         Fix_lig();
     }
 
-    public override void Update_gfx()
+    public override void Update_gfx()// updatuje grafiku noty
     {
         //pomocne carky
         if (vyska < -3)
@@ -556,7 +551,7 @@ public class Nota : Znak
                 carka_licha.SetActive(true);
                 carka_suda.SetActive(false);
             }
-            int targ_carek = (Math.Abs(vyska) - 2) / 2 - 1;
+            int targ_carek = (Math.Abs(vyska) - 2) / 2 - 1;// cilove mnozstvi pomocnych car  zmenseno o dva(vdalenonost referencni linky od te spodni) / 2 liky jsou kazda dva body vysky - 1 kvuli originalum
             for (int i = 0; i < carky.GetLength(0); i++)
             {
                 Destroy(carky[i]);
@@ -585,7 +580,7 @@ public class Nota : Znak
                 carka_licha.SetActive(true);
                 carka_suda.SetActive(false);
             }
-            int targ_carek = (Math.Abs(vyska) - 6) / 2 - 1;
+            int targ_carek = (Math.Abs(vyska) - 6) / 2 - 1;// cilove mnozstvi pomocnych car  zmenseno o sest(vdalenonost referencni linky od te horni) / 2 liky jsou kazda dva body vysky - 1 kvuli originalum
             for (int i = 0; i < carky.GetLength(0); i++)
             {
                 Destroy(carky[i]);
@@ -629,7 +624,7 @@ public class Nota : Znak
         if (Delka < 3)
         {
             gameObject.GetComponent<Image>().sprite = Gfx.Nota_ctvrt;
-            if (Delka < 2)
+            if (Delka < 2) // prapory
             {
                 prapor_GOs[0].SetActive(true);
                 if (Delka == 1)
@@ -657,12 +652,12 @@ public class Nota : Znak
             {
                 gameObject.GetComponent<Image>().sprite = Gfx.Nota_cela;
             }
-            for (int i = 0; i < prapor_GOs.GetLength(0); i++)
+            for (int i = 0; i < prapor_GOs.GetLength(0); i++)//vypne prapory
             {
                 prapor_GOs[i].SetActive(false);
             }
         }
-        //topfix
+        //topfix nepouzite
         if (topfix != 0)
         {
             topfix_GO.SetActive(true);
@@ -671,7 +666,7 @@ public class Nota : Znak
         {
             topfix_GO.SetActive(false);
         }
-        //postfix
+        //postfix (tecky)
         for (int i = 0; i < postfix_GO.GetLength(0); i++)
         {
             if (postfix > i)
@@ -686,7 +681,7 @@ public class Nota : Znak
         }
     }
 
-    public override void Do_lig(bool previous = false)
+    public override void Do_lig(bool previous = false) // udela ligaturu s nasledujici notou( nebo predchozi pokud previous je true)
     {
         if (previous)
         {
@@ -695,17 +690,21 @@ public class Nota : Znak
                 prev.Do_lig(); 
             }
         }
-        else if (next != null)
+        else if (next != null)// naledujici znak musi existovat
         {
-            if (Next.is_nota())
+            if (Next.is_nota())// ligatury jsou pouze s jinou notou
             {
-                if (((Nota)next).vyska == vyska)
+                if (((Nota)next).vyska == vyska)// ligatura spojuje noty stejen vysky
                 {
-                    if (lig_next != null && lig_next == Next.Lig_prev)
+                    if (lig_next != null)// pokud zde uz ligatura je tak li odstranime
                     {
                         Destroy(lig_next);
+                        if (next.Lig_prev != null)
+                        {
+                            Destroy(next.Lig_prev);
+                        }
                     }
-                    else if (next.Pos_y == Pos_y)
+                    else if (next.Pos_y == Pos_y)// pokud jsou obe noty na stejne radce
                     {
                         if (lig_next != null)
                         {
@@ -723,12 +722,12 @@ public class Nota : Znak
                         {
                             lig_next.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
                         }
-                        else
+                        else//pro nizke noty je ligatura obracena tj. pod notami
                         {
                             lig_next.transform.rotation = Quaternion.Euler(0f, 0f, 180f);
                         }
                     }
-                    else
+                    else// pro noty na krajich radku
                     {
                         if (lig_next != null)
                         {
@@ -747,7 +746,7 @@ public class Nota : Znak
                             lig_next.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
                             Next.Lig_prev.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
                         }
-                        else
+                        else//pro nizke noty je ligatura obracena tj. pod notami
                         {
                             lig_next.transform.rotation = Quaternion.Euler(0f, 0f, 180f);
                             Next.Lig_prev.transform.rotation = Quaternion.Euler(0f, 0f, 180f);
@@ -756,17 +755,23 @@ public class Nota : Znak
                 }
                 else
                 {
-                    Destroy(lig_next);
+                    if (lig_next != null) // pokud ligatura neni mozna tak se ujistime ze nexstuje
+                    {
+                        Destroy(lig_next); 
+                    }
                 }
             }
             else
             {
-                Destroy(lig_next);
+                if (lig_next != null)
+                {
+                    Destroy(lig_next);
+                }
             }
         }
     }
 
-    public override void Do_data()
+    public override void Do_data() // priradi odkazy na obekty
     {
         prapor_GOs = new GameObject[2];
         postfix_GO = new GameObject[3];
@@ -788,28 +793,7 @@ public class Nota : Znak
 
 public class Pomlka : Znak
 {
-    GameObject[] postfix_GO;
     
-    public override int Postfix
-    {
-        get => postfix;
-        set
-        {
-            if (value < 0)
-            {
-                postfix = 0;
-            }
-            else if (value > 3)
-            {
-                postfix = 3;
-            }
-            else
-            {
-                postfix = value;
-            }
-        }
-    }
-
     public override string Give_String()
     {
         return "P," + Delka + "," + postfix + ";";
@@ -820,7 +804,7 @@ public class Pomlka : Znak
         return false;
     }
 
-    public override bool FromString(string input)
+    public override bool FromString(string input) // ziska data ze stringu
     {
         bool error = false;
         char[] filter = new char[1] { ',' };
@@ -855,12 +839,12 @@ public class Pomlka : Znak
         return error;
     }
 
-    public override int[] Copy()
+    public override int[] Copy()// posle data na change menu
     {
         return new int[3] {1, Delka, postfix};
     }
 
-    public override void Paste(int[] input)
+    public override void Paste(int[] input) // vystup z change menu
     {
         if (input[0] == 1)
         {
@@ -921,8 +905,8 @@ public class Pomlka : Znak
         Update_gfx();
     }
 }
-
-class Acord : Znak//not in use
+/*                   Nepouzito
+class Acord : Znak
 {
     Nota start;
     
@@ -991,4 +975,4 @@ class Acord : Znak//not in use
         }
     }
 }
-
+*/
