@@ -41,17 +41,25 @@ public class Screen_Ctrl : MonoBehaviour
                 break;
             case 13://loading from file
                 Hand_Ctrl original = gameObject.GetComponent<Hand_Ctrl>();
-                Hand_Ctrl temp = gameObject.AddComponent<Hand_Ctrl>().Give_data(saver.getString(), out bool[] errors);
+                Hand_Ctrl temp = gameObject.AddComponent<Hand_Ctrl>();
+                temp.Load_decoys();
+                temp.Give_data(saver.getString(), out bool[] errors);
                 errors = Log_Error(errors);
-                if (!errors[0])//it didnt actualy load
+                temp.Reset();
+                Destroy(temp);
+                Znak.CTRL = original;
+                if (!errors[0])//it loaded
                 {
-                    temp.transform.SetParent(gameObject.transform);
-                    Destroy(original);
+                    original.Give_data(saver.getString(), out errors);
                     current = workplace;
+                    if (errors[1])
+                    {
+                        Errorlog.transform.SetParent(current.transform);
+                        Errorlog.SetActive(true);
+                    }
                 }
-                if (errors[1])
+                else
                 {
-                    Znak.CTRL = original;
                     Errorlog.transform.SetParent(current.transform);
                     Errorlog.SetActive(true);
                 }

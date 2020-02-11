@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Line_Ctrl : MonoBehaviour
 {
@@ -35,6 +36,18 @@ public class Line_Ctrl : MonoBehaviour
             {
                 takty[i].SetActive(state); 
             }
+        }
+    }
+
+    public void Update_gfx(Holder hold)
+    {
+        if (hold.klic == 0)
+        {
+            klic.GetComponent<Image>().sprite = Znak.Gfx.H_klic;
+        }
+        else
+        {
+            klic.GetComponent<Image>().sprite = Znak.Gfx.B_klic;
         }
     }
 }

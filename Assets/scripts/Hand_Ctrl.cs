@@ -23,22 +23,30 @@ public class Hand_Ctrl : MonoBehaviour
     public GameObject proto_lig;
     public GameObject proto_lig_side;
 
-     Holder[] hands;
+    static GameObject decoy_linka;
+    static GameObject decoy_nota;
+    static HUD_ctrl decoy_HUD;
+    static GameObject decoy_paper;
+    static GameObject decoy_takt;
+    static GameObject decoy_pred;
+
+    public Holder[] hands;
 
     int selected_hand = 0;
 
     public int predznamenani = 0; //0 = cdur kladny jsou krizky, zaporny jsou becka
     public int takt = 1;
 
-    public override string ToString()
+    public string Give_String()
     {
         string dat = "";
-        for (int i = hands.GetLength(0); i > 0; i--)
+        for (int i = hands.GetLength(0) - 1; i >= 0; i--)
         {
             hands[i].vybrany = hands[i].Prvni;
             while (hands[i].vybrany != null)
             {
-                dat = dat + hands[i].vybrany.ToString();
+                dat = dat + hands[i].vybrany.Give_String();
+                hands[i].vybrany = hands[i].vybrany.Next;
             }
             dat = "H," + hands[i].klic + ";" + dat;
         }
@@ -62,7 +70,7 @@ public class Hand_Ctrl : MonoBehaviour
         {
             if (output > 0)
             {
-                hands = new Holder[output];
+                int tmp_hand_count = output;
 
                 if (int.TryParse(localdata[1], out output))
                 {
@@ -82,6 +90,8 @@ public class Hand_Ctrl : MonoBehaviour
                     errors[5] = true;
                 }
 
+                Create(tmp_hand_count);
+
                 int index = -1;
                 for (int i = 1; i < data.GetLength(0); i++)
                 {
@@ -92,7 +102,6 @@ public class Hand_Ctrl : MonoBehaviour
                             if (hands.GetLength(0) != index)
                             {
                                 index++;
-
                                 if (int.TryParse(localdata[1], out output))
                                 {
                                     hands[index].klic = output;
@@ -101,6 +110,7 @@ public class Hand_Ctrl : MonoBehaviour
                                 {
                                     errors[5] = true;
                                 }
+                                hands[index].first.Update_gfx(hands[index]);
                             }
                             else
                             {
@@ -126,7 +136,7 @@ public class Hand_Ctrl : MonoBehaviour
                             errors[6] = (Add_Pomlka(hands[index]).FromString(data[i]) || errors[6]);
                             break;
 
-                        case "A":
+                        case "A"://not in use
                             if (index == -1)
                             {
                                 errors[4] = true;
@@ -603,7 +613,6 @@ public class Hand_Ctrl : MonoBehaviour
         {
             takt_bot.GetComponent<Text>().text = "4";
             takt_top.GetComponent<Text>().text = (tmp / 2).ToString();
-
         }
         for (int i = 0; i < data[0]; i++)
         {
@@ -612,6 +621,28 @@ public class Hand_Ctrl : MonoBehaviour
             hands[i].id = i;
             Add_line(hands[i]);
             Add_Nota(hands[i]);
+        }
+    }
+    public void Create(int hand_count)
+    {
+        hands = new Holder[hand_count];
+        int tmp = takt / 2;
+        if (tmp % 2 == 1)
+        {
+            takt_bot.GetComponent<Text>().text = "8";
+            takt_top.GetComponent<Text>().text = tmp.ToString();
+        }
+        else
+        {
+            takt_bot.GetComponent<Text>().text = "4";
+            takt_top.GetComponent<Text>().text = (tmp / 2).ToString();
+        }
+        for (int i = 0; i < hand_count; i++)
+        {
+            hands[i] = new Holder();
+            hands[i].id = i;
+            Add_line(hands[i]);
+            hands[i].selected.takty = new GameObject[Znak.takts_per_line];
         }
     }
 
@@ -670,9 +701,38 @@ public class Hand_Ctrl : MonoBehaviour
     void Start()
     {
         Znak.CTRL = this;
-        Znak.ref_point = proto_nota.transform.position;
+        if (proto_nota != null)
+        {
+            Znak.ref_point = proto_nota.transform.position;
+            decoy_linka = proto_linka;
+            decoy_nota = proto_nota;
+            decoy_HUD = Select_HUD;
+            decoy_paper = paper;
+            decoy_takt = takt_top;
+            decoy_pred = proto_pred_b;
+        }
     }
     void Update() { }
+
+    public void Load_decoys()
+    {
+        Znak.CTRL = this;
+        Select_HUD = decoy_HUD;
+        End_HUD = decoy_HUD;
+        paper = decoy_paper;
+        takt_top = decoy_takt;
+        takt_bot = decoy_takt;
+        proto_pred_h = decoy_pred;
+        proto_pred_b = decoy_pred;
+
+        proto_nota = decoy_nota;
+        proto_linka = decoy_linka;
+        proto_klic = decoy_linka;
+        proto_end = decoy_linka;
+        proto_takt = decoy_linka;
+        proto_lig = decoy_linka;
+        proto_lig_side = decoy_linka;
+    }
 
     public void Recalc(Znak target)
     {

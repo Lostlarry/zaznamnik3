@@ -17,7 +17,7 @@ public class Save_Load : MonoBehaviour
         //string savefile = strEx("Save File", "nml", "/saves");
         if (savefile != "")
         {
-            string output = gameObject.GetComponent<Hand_Ctrl>().ToString();
+            string output = gameObject.GetComponent<Hand_Ctrl>().Give_String();
             TextWriter writer = new StreamWriter(savefile, false);
             writer.WriteLine(output);
             writer.Close();

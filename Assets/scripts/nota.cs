@@ -226,7 +226,7 @@ public class Znak : MonoBehaviour
         Update_gfx();
     }
 
-    public override string ToString()
+    public virtual string Give_String()
     {
         return "Z,"+Delka+";";
     }
@@ -410,7 +410,7 @@ public class Nota : Znak
         Calc_Pos();
     }
 
-    public override string ToString()
+    public override string Give_String()
     {
         return "N,"+Delka+","+vyska+","+prefix+","+postfix+","+(lig_prev!=null)+";";
     }
@@ -760,7 +760,7 @@ public class Pomlka : Znak
 {
     GameObject[] postfix_GO;
 
-    public override string ToString()
+    public override string Give_String()
     {
         return "P," + Delka + "," + postfix + ";";
     }
@@ -886,13 +886,13 @@ class Acord : Znak//not in use
     {
     }
 
-    public override string ToString()
+    public override string Give_String()
     {
         string output = "";
         Nota selected = start;
         while (selected != null)
         {
-            output = output + selected.ToString();
+            output = output + selected.Give_String();
         }
         return "A," + Delka + "," + output + ";";
     }
