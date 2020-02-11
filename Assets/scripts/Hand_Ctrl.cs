@@ -397,6 +397,11 @@ public class Hand_Ctrl : MonoBehaviour
 
     private void Shift_prev(Znak target = null)
     {
+        bool lig = false;
+        if (target.Lig_next != null)
+        {
+            lig = true;
+        }
         if (target == null)
         {
             target = hands[selected_hand].vybrany;
@@ -426,11 +431,22 @@ public class Hand_Ctrl : MonoBehaviour
             }
             target.Swap_Pos(swap);
         }
+        Recalc(target);
+        Do_Takty(target.master);
         Select_HUD.Adjust_HUD(target);
+        if (lig)
+        {
+            target.Do_lig(true);
+        }
     }
 
     private void Shift_next(Znak target = null)
     {
+        bool lig = false;
+        if (target.Lig_next != null)
+        {
+            lig = true;
+        }
         if (target == null)
         {
             target = hands[selected_hand].vybrany;
@@ -460,8 +476,13 @@ public class Hand_Ctrl : MonoBehaviour
             }
             target.Swap_Pos(swap);
         }
+        Recalc(swap);
+        Do_Takty(target.master);
         Select_HUD.Adjust_HUD(target);
-
+        if (lig)
+        {
+            target.Do_lig();
+        }
     }
 
     private void Remove(Znak target = null)
@@ -470,7 +491,7 @@ public class Hand_Ctrl : MonoBehaviour
         {
             target = hands[selected_hand].vybrany;
         }
-        Znak swap = target.Next;
+        Holder hold = target.master;
         if (target.Prev != null)
         {
             if (target.Next != null)
@@ -482,25 +503,34 @@ public class Hand_Ctrl : MonoBehaviour
             else
             {
                 target.Prev.Next = null;
-                target.master.Posledni = target.Prev;
+                hold.Posledni = target.Prev;
             }
+            hold.vybrany = target.Prev;
         }
         else if (target.Next != null)
         {
             Recalc(target.Next);
             target.Next.Prev = null;
-            target.master.Prvni = target.Next;
+            hold.Prvni = target.Next;
+            hold.vybrany = target.Next;
         }
         else
         {
-            target.master.Prvni = null;
-            target.master.Posledni = null;
+            hold.Prvni = null;
+            hold.Posledni = null;
+            Add_Nota(hold);
         }
         Destroy(target.gameObject);
-
+        if (hold.Prvni == null)
+        {
+            Add_Nota(hold);
+        }
+        Do_Takty(hold);
+        Select_HUD.Adjust_HUD(hold.Posledni);
+        End_HUD.Adjust_HUD(hold.Posledni);
     }
 
-    private void Change(Znak target = null)
+    public Znak Change(Znak target = null)
     {
         if (target == null)
         {
@@ -516,7 +546,12 @@ public class Hand_Ctrl : MonoBehaviour
             made = target.gameObject.AddComponent<Nota>();
         }
         made.Load(target);
+        made.Calc_Pos();
+        made.Update_gfx();
+        Select_HUD.Adjust_HUD(made);
+        End_HUD.Adjust_HUD(made.master.Posledni);
         Destroy(target);
+        return made;
     }
 
     public void Reset(int[] data)
@@ -774,7 +809,7 @@ public class Hand_Ctrl : MonoBehaviour
                     {
                         hold.selected.takty[(modulo) - 1] = Instantiate(proto_takt, hold.selected.transform, false);
                         hold.selected.takty[(modulo) - 1].SetActive(true);
-                        hold.selected.takty[(modulo) - 1].transform.position = new Vector3(proto_nota.transform.position.x + (modulo) * Znak.takt_width + modulo * Znak.cara_width - 40f, hold.selected.transform.position.y);
+                        hold.selected.takty[(modulo) - 1].transform.position = new Vector3(proto_nota.transform.position.x + (modulo) * Znak.takt_width + modulo * Znak.cara_width - 30f, hold.selected.transform.position.y);
                     }
                 }
                 else

@@ -103,7 +103,18 @@ public class Nota_ProtoType : MonoBehaviour
         }
         set
         {
-            postfix = value;
+            if (value > 3)
+            {
+                postfix = 3;
+            }
+            else if (value < 0)
+            {
+                postfix = 0;
+            }
+            else
+            {
+                postfix = value;
+            }
             Update_gfx();
         }
     }
@@ -150,7 +161,7 @@ public class Nota_ProtoType : MonoBehaviour
         carky[0].SetActive(false);
 
         Update_gfx();
-        return new int[3] { vyska, delka, output };
+        return new int[4] { vyska, delka, output, postfix };
     }
 
     public int[] Send()

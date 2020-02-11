@@ -13,7 +13,7 @@ public class Change_ctrl : MonoBehaviour
     public Button[] vyska_buttons;
     public InputField Vyska_txt;
     public InputField Delka_txt;
-
+    public InputField postfix_txt;
     public Predznamenani pred;
     public GameObject klic;
 
@@ -29,11 +29,13 @@ public class Change_ctrl : MonoBehaviour
     {
         prototype.Vyska = prototype.Vyska + Change;
         Vyska_txt.text = prototype.Vyska.ToString();
+        Control_prefix();
     }
 
     public void Input_vyska(string Target_vyska)
     {
         prototype.Vyska = int.Parse(Target_vyska);
+        Control_prefix();
     }
 
     public void Mod_delka(int Change)
@@ -61,10 +63,11 @@ public class Change_ctrl : MonoBehaviour
             prototype.Nota = is_nota;
             for (int i = 0; i < vyska_buttons.GetLength(0); i++)
             {
-                vyska_buttons[i].enabled = is_nota;
+                vyska_buttons[i].interactable = is_nota;
             }
-            Vyska_txt.enabled = is_nota;
+            Vyska_txt.interactable = is_nota;
             swaping = false;
+            Control_prefix();
         }
     }
 
@@ -111,9 +114,9 @@ public class Change_ctrl : MonoBehaviour
             }
             pred.Activate(CTRL.predznamenani);
             int[] output = prototype.Copy(target);
-
             Vyska_txt.text = output[0].ToString();
             Delka_txt.text = Math.Pow(2, output[1]).ToString();
+            postfix_txt.text = output[3].ToString();
             if (output[2] == 1)
             {
                 nota.isOn = true;
@@ -125,11 +128,17 @@ public class Change_ctrl : MonoBehaviour
                 pomlka.isOn = true;
             }
             swaping = false;
+            Control_prefix();
+            Input_prefix(prototype.Prefix);
         }
     }
 
     public void Send_data()
     {
+        if (target_note.is_nota() != prototype.Nota)
+        {
+            Znak.CTRL.Change(target_note);
+        }
         target_note.Paste(prototype.Send());
     }
 
@@ -138,36 +147,50 @@ public class Change_ctrl : MonoBehaviour
         if (!swaping)
         {
             swaping = true;
-            if (nota)
+            if (prototype.Nota)
             {
                 int result = pred.Is_moded(prototype.Vyska, target_note.master.klic);
-                if (result == 1)
+                for (int i = 0; i < prefix.GetLength(0); i++)
                 {
-                    prefix[1].enabled = false;//krizek blokuje becko
-                    prefix[1].isOn = false;
-                }
-                else if (result == 2)
-                {
-                    prefix[0].enabled = false;//becko blokuje krizek
-                    prefix[0].isOn = false;
-                }
-                else
-                {
-                    prefix[2].enabled = false;//zadny predznamanani blokuje odrazku
-                    prefix[2].isOn = false;
+                    if (result == i)
+                    {
+                        prefix[i].isOn = false;
+                        prefix[i].interactable = false;//krizek blokuje becko
+                    }
+                    else 
+                    {
+                        prefix[i].isOn = false;
+                        prefix[i].interactable = true;//krizek blokuje becko
+                    }
                 }
             }
             else
             {
                 for (int i = 0; i < prefix.GetLength(0); i++)
                 {
-                    prefix[i].enabled = false;//becko blokuje krizek
                     prefix[i].isOn = false;
+                    prefix[i].interactable = false;//pomlka nema prefix
                 }
             } 
         }
         swaping = false;
     }
+
+    public void Mod_postfix(int Change)
+    {
+        prototype.Postfix = prototype.Postfix + Change;
+        postfix_txt.text = prototype.Postfix.ToString();
+    }
+
+    public void Input_postfix(string Target_delka)
+    {
+        if (int.TryParse(Target_delka, out int output))
+        {
+            prototype.Postfix = output;
+        }
+        postfix_txt.text = prototype.Postfix.ToString();
+    }
+
 
 
     // Start is called before the first frame update

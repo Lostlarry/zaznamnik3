@@ -28,20 +28,12 @@ public class HUD_ctrl : MonoBehaviour
         if (select)
         {
             gameObject.transform.position = ref_point + new Vector3(target.Pos_x * Znak.takt_width + (float)Math.Floor(target.Pos_x) * Znak.cara_width, (mod + target.Pos_y) * Hand_Ctrl.vyska_linek, 0);
-            for (int i = 0; i < toggle_able.GetLength(0); i++)
-            {
-                toggle_able[i].SetActive(target.is_nota());
-            }
-            for (int i = 0; i < auth_able.GetLength(0); i++)
-            {
-                auth_able[i].SetActive(auth);
-            }
         }
         else
         {
             int posy = target.Pos_y;
             float posx = target.Pos_x + 1;
-            if(posx > Znak.takts_per_line)
+            if (posx > Znak.takts_per_line)
             {
                 Send_Command(10);
                 posy++;

@@ -94,8 +94,7 @@ public class Znak : MonoBehaviour
     }
 
     public void Adapt(float input, bool made = false)
-    {
-        Debug.Log(gameObject.name + " k " + input);
+    { 
         float rem_input = input;
         int tmp_delka = -1;
         int targ_post = 0;
@@ -110,7 +109,7 @@ public class Znak : MonoBehaviour
                 }
                 else
                 {
-                    rem_input = rem_input - (float)Math.Pow(2, i) * (float)Math.Pow(2, tmp_delka);
+                    rem_input = rem_input - (float)Math.Pow(2, -i) * (float)Math.Pow(2, tmp_delka);
                     targ_post++;
                 }
             }
@@ -157,13 +156,24 @@ public class Znak : MonoBehaviour
                 CTRL.Add_Pomlka(master, target, 1, (float)(Math.Pow(2, Ex_delka) * (2 - Math.Pow(2, -Ex_postfix)) - input));
             }
         }
-        Debug.Log(gameObject.name + "asdwadw");
         Update_gfx();
     }
 
     public void Load(Znak Z)
     {
-        Delka = Z.Delka;
+        delka = Z.delka;
+        master = Z.master;
+        next = Z.next;
+        prev = Z.prev;
+        if (prev != null)
+        {
+            prev.next = this; 
+        }
+        if (next != null)
+        {
+            next.prev = this; 
+        }
+        Do_data();
         Update_delka();
     }
 
@@ -331,7 +341,7 @@ public class Znak : MonoBehaviour
             Do_lig();
         }
     }
-    protected virtual void Update_gfx() { }
+    public virtual void Update_gfx() { }
     public virtual void Do_data() { }
 
     void Start() { }
@@ -355,6 +365,26 @@ public class Nota : Znak
 
     int prefix = 0;// 0= nic 1 = krizky 2 = becka 3 = cista 
     int topfix = 0;// 0 = nic 1 
+
+    public override int Postfix
+    {
+        get => postfix;
+        set
+        {
+            if (value < 0)
+            {
+                postfix = 0;
+            }
+            else if (value > 3)
+            {
+                postfix = 3;
+            }
+            else
+            {
+                postfix = value;
+            }
+        }
+    }
 
     public override GameObject Lig_next
     {
@@ -506,7 +536,7 @@ public class Nota : Znak
         Fix_lig();
     }
 
-    protected override void Update_gfx()
+    public override void Update_gfx()
     {
         //pomocne carky
         if (vyska < -3)
@@ -759,6 +789,26 @@ public class Nota : Znak
 public class Pomlka : Znak
 {
     GameObject[] postfix_GO;
+    
+    public override int Postfix
+    {
+        get => postfix;
+        set
+        {
+            if (value < 0)
+            {
+                postfix = 0;
+            }
+            else if (value > 3)
+            {
+                postfix = 3;
+            }
+            else
+            {
+                postfix = value;
+            }
+        }
+    }
 
     public override string Give_String()
     {
@@ -823,7 +873,7 @@ public class Pomlka : Znak
         }
     }
 
-    protected override void Update_gfx()
+    public override void Update_gfx()
     {
         //delka pomka
         switch (Delka)
