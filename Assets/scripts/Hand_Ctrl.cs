@@ -204,16 +204,7 @@ public class Hand_Ctrl : MonoBehaviour
         made.Hand_id = hands.GetLength(0) - 1 + hand.id;
         if (adapt < 0)//priradi delku
         {
-            int tmp_delka = 1;
-            for (int i = 4; i > -1; i--)
-            {
-                if (Math.Pow(2, i) <= takt)
-                {
-                    tmp_delka = i;
-                    i = -1;
-                }
-            }
-            made.Delka = tmp_delka;
+            made.Delka = 1;// delka je nastavená na 1 šestnáctinu aby zbytečně nespouštela funkci Znak.Adapt což by způsobylo zmatek
         }
         else
         {
@@ -266,18 +257,9 @@ public class Hand_Ctrl : MonoBehaviour
         made.Do_data();
         made.master = hand;
         made.Hand_id = hands.GetLength(0) - 1 + hand.id;
-        if (adapt < 0)
+        if (adapt < 0)//priradi delku
         {
-            int tmp_delka = 1;
-            for (int i = 4; i > -1; i--)
-            {
-                if (Math.Pow(2, i) <= takt)
-                {
-                    tmp_delka = i;
-                    i = -1;
-                }
-            }
-            made.Delka = tmp_delka;
+            made.Delka = 1;
         }
         else
         {
@@ -388,13 +370,13 @@ public class Hand_Ctrl : MonoBehaviour
     private void Shift_prev(Znak target = null)// vymeni notu s tou pred ni
     {
         bool lig = false;
-        if (target.Lig_prev != null)
-        {
-            lig = true;
-        }
         if (target == null)
         {
             target = hands[selected_hand].vybrany;
+        }
+        if (target.Lig_prev != null)
+        {
+            lig = true;
         }
         Znak swap = target.Prev;
         if (swap != null)
@@ -433,13 +415,13 @@ public class Hand_Ctrl : MonoBehaviour
     private void Shift_next(Znak target = null)// stejny jako predchozi fce ale vymenujeme s predchozim znakem
     {
         bool lig = false;
-        if (target.Lig_next != null)
-        {
-            lig = true;
-        }
         if (target == null)
         {
             target = hands[selected_hand].vybrany;
+        }
+        if (target.Lig_next != null)
+        {
+            lig = true;
         }
         Znak swap = target.Next;
         if (swap != null)

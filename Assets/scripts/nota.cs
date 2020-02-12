@@ -181,6 +181,8 @@ public class Znak : MonoBehaviour
 
     public void Load(Znak Z)// nacte data z jineha znaku  pouzito pouze pri zmene noty na pomlku a obracene
     {
+        pos_x = Z.pos_x;
+        pos_y = Z.pos_y;
         delka = Z.delka;
         master = Z.master;
         next = Z.next;
