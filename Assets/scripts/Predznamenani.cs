@@ -62,7 +62,7 @@ public class Predznamenani : MonoBehaviour
         {
             return 1;//krizek
         }
-        else if(odchylka > (2 - mod_vyska) * 2 % 7)
+        else if(-odchylka > make_positive((2 - mod_vyska) * 2) % 7)
         {
             return 2;//becko
         }

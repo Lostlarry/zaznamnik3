@@ -184,6 +184,10 @@ public class Nota_ProtoType : MonoBehaviour
             gameObject.transform.position = ref_point + new Vector3(0, vyska * Znak.nota_height);
             if (vyska > 1)
             {
+                for (int i = 0; i < prapor_GOs.GetLength(0); i++)
+                {
+                    prapor_GOs[i].transform.rotation = Quaternion.Euler(0f, 180f, 0f);
+                }
                 gameObject.transform.rotation = Quaternion.Euler(0f, 0f, 180f);
                 prefix_GO.transform.position = new Vector3(-Math.Abs(prefix_GO.transform.position.x), prefix_GO.transform.position.y, prefix_GO.transform.position.z);
                 prefix_GO.transform.rotation = Quaternion.Euler(0f, 0f, 180f);
@@ -193,6 +197,10 @@ public class Nota_ProtoType : MonoBehaviour
                 gameObject.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
                 prefix_GO.transform.position = new Vector3(Math.Abs(prefix_GO.transform.position.x), prefix_GO.transform.position.y, prefix_GO.transform.position.z);
                 prefix_GO.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
+                for (int i = 0; i < prapor_GOs.GetLength(0); i++)
+                {
+                    prapor_GOs[i].transform.rotation = Quaternion.Euler(0f, 0f, 0f);
+                }
             }
             //pomocne carky
             if (vyska < -3)
@@ -282,13 +290,13 @@ public class Nota_ProtoType : MonoBehaviour
                     break;
             }
             //delka not
-            if (delka < 3)
+            if (Delka < 3)
             {
                 gameObject.GetComponent<Image>().sprite = Gfx.Nota_ctvrt;
-                if (delka < 2)
+                if (Delka < 2) // prapory
                 {
                     prapor_GOs[0].SetActive(true);
-                    if (delka == 0)
+                    if (Delka == 0)
                     {
                         prapor_GOs[1].SetActive(true);
                     }
@@ -305,7 +313,7 @@ public class Nota_ProtoType : MonoBehaviour
             }
             else
             {
-                if (delka == 3)
+                if (Delka == 3)
                 {
                     gameObject.GetComponent<Image>().sprite = Gfx.Nota_pull;
                 }
@@ -313,7 +321,7 @@ public class Nota_ProtoType : MonoBehaviour
                 {
                     gameObject.GetComponent<Image>().sprite = Gfx.Nota_cela;
                 }
-                for (int i = 0; i < prapor_GOs.GetLength(0); i++)
+                for (int i = 0; i < prapor_GOs.GetLength(0); i++)//vypne prapory
                 {
                     prapor_GOs[i].SetActive(false);
                 }

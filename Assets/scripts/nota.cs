@@ -191,9 +191,17 @@ public class Znak : MonoBehaviour
         {
             prev.next = this; 
         }
+        else
+        {
+            master.Prvni = this;
+        }
         if (next != null)
         {
             next.prev = this; 
+        }
+        else
+        {
+            master.Posledni = this;
         }
         Do_data();
         Update_delka();
@@ -317,7 +325,7 @@ public class Znak : MonoBehaviour
         double mod = Math.Pow(2, prev.Delka) * (2 - Math.Pow(2, -prev.postfix));
         Pos_y = prev.pos_y;
         pos_x = prev.pos_x + (float)mod / CTRL.takt;
-        if (Pos_x > takts_per_line)
+        if (Pos_x >= takts_per_line + 1)
         {
             pos_x = 0;
             pos_y++;
@@ -415,12 +423,20 @@ public class Nota : Znak
             gameObject.transform.rotation = Quaternion.Euler(0f, 0f, 180f);
             prefix_GO.transform.position = new Vector3(-Math.Abs(prefix_GO.transform.position.x), prefix_GO.transform.position.y, prefix_GO.transform.position.z);
             prefix_GO.transform.rotation = Quaternion.Euler(0f, 0f, 180f);
+            for (int i = 0; i < prapor_GOs.GetLength(0); i++)
+            {
+                prapor_GOs[i].transform.rotation = Quaternion.Euler(0f, 180f, 0f);
+            }
         }
         else
         {
             gameObject.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
             prefix_GO.transform.position = new Vector3(Math.Abs(prefix_GO.transform.position.x), prefix_GO.transform.position.y, prefix_GO.transform.position.z);
             prefix_GO.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
+            for (int i = 0; i < prapor_GOs.GetLength(0); i++)
+            {
+                prapor_GOs[i].transform.rotation = Quaternion.Euler(0f, 0f, 0f);
+            }
         }
         Fix_lig();
     }
@@ -629,7 +645,7 @@ public class Nota : Znak
             if (Delka < 2) // prapory
             {
                 prapor_GOs[0].SetActive(true);
-                if (Delka == 1)
+                if (Delka == 0)
                 {
                     prapor_GOs[1].SetActive(true);
                 }
@@ -786,6 +802,10 @@ public class Nota : Znak
         prapor_GOs[1] = gameObject.transform.GetChild(5).gameObject;
         carka_licha = gameObject.transform.GetChild(6).gameObject;
         carka_suda = gameObject.transform.GetChild(7).gameObject;
+        prapor_GOs[0].SetActive(true);
+        prapor_GOs[1].SetActive(true);
+        carka_licha.SetActive(true);
+        carka_suda.SetActive(true);
         carky = new GameObject[1];
         carky[0] = Instantiate(carka_licha, gameObject.transform);
         carky[0].SetActive(false);
@@ -904,6 +924,10 @@ public class Pomlka : Znak
         postfix_GO[0] = gameObject.transform.GetChild(2).gameObject;
         postfix_GO[1] = gameObject.transform.GetChild(8).gameObject;
         postfix_GO[2] = gameObject.transform.GetChild(9).gameObject;
+        gameObject.transform.GetChild(4).gameObject.SetActive(false);// objekt ma default ne tyto objekty zapnute
+        gameObject.transform.GetChild(5).gameObject.SetActive(false);// ikdyz by se u pomlky nemely vyskytovat
+        gameObject.transform.GetChild(6).gameObject.SetActive(false);
+        gameObject.transform.GetChild(7).gameObject.SetActive(false);
         Update_gfx();
     }
 }

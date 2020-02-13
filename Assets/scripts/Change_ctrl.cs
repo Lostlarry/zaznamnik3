@@ -48,7 +48,7 @@ public class Change_ctrl : MonoBehaviour
     {
         if (int.TryParse(Target_delka, out int output))
         {
-            prototype.Delka = (int)Math.Floor(Math.Sqrt(output));
+            prototype.Delka = (int)Math.Floor(Math.Log(output,2));
         }
         Delka_txt.text = Math.Pow(2, prototype.Delka).ToString();
     }
@@ -58,14 +58,23 @@ public class Change_ctrl : MonoBehaviour
         if (!swaping)
         {
             swaping = true;// modifikujeme isOn hodnotu togglu ktere spousteji tuto funkci takze se musime ujistit ze se vykona je jednou
-            nota.isOn = is_nota;
-            pomlka.isOn = !is_nota;
-            prototype.Nota = is_nota;
+            bool state;
+            if (is_nota)
+            {
+                state = nota.isOn; 
+            }
+            else
+            {
+                state = !pomlka.isOn;
+            }
+            nota.isOn = state;
+            pomlka.isOn = !state;
+            prototype.Nota = state;
             for (int i = 0; i < vyska_buttons.GetLength(0); i++)
             {
-                vyska_buttons[i].interactable = is_nota;
+                vyska_buttons[i].interactable = state;
             }
-            Vyska_txt.interactable = is_nota;
+            Vyska_txt.interactable = state;
             swaping = false;
             Control_prefix();
         }
@@ -136,7 +145,7 @@ public class Change_ctrl : MonoBehaviour
     {
         if (target_note.is_nota() != prototype.Nota)
         {
-            Znak.CTRL.Change(target_note);
+            target_note = Znak.CTRL.Change(target_note);
         }
         target_note.Paste(prototype.Send());
     }

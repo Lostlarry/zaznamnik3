@@ -204,7 +204,7 @@ public class Hand_Ctrl : MonoBehaviour
         made.Hand_id = hands.GetLength(0) - 1 + hand.id;
         if (adapt < 0)//priradi delku
         {
-            made.Delka = 1;// delka je nastavená na 1 šestnáctinu aby zbytečně nespouštela funkci Znak.Adapt což by způsobylo zmatek
+            made.Delka = 0;// delka je nastavená na 1 šestnáctinu aby zbytečně nespouštela funkci Znak.Adapt což by způsobylo zmatek
         }
         else
         {
@@ -252,6 +252,7 @@ public class Hand_Ctrl : MonoBehaviour
         }
         GameObject GO = Instantiate(proto_nota, paper.transform, false);
         GO.name = "note " + hand.not + " " + hand.id;
+        GO.SetActive(true);
         hand.not++;
         Pomlka made = GO.AddComponent<Pomlka>();
         made.Do_data();
@@ -259,7 +260,7 @@ public class Hand_Ctrl : MonoBehaviour
         made.Hand_id = hands.GetLength(0) - 1 + hand.id;
         if (adapt < 0)//priradi delku
         {
-            made.Delka = 1;
+            made.Delka = 0;
         }
         else
         {
@@ -520,6 +521,7 @@ public class Hand_Ctrl : MonoBehaviour
         made.Load(target);//zavola vsechny dulezite fce
         made.Calc_Pos();
         made.Update_gfx();
+        made.master.vybrany = made;
         Select_HUD.Adjust_HUD(made);
         End_HUD.Adjust_HUD(made.master.Posledni);
         Destroy(target);
@@ -766,7 +768,7 @@ public class Hand_Ctrl : MonoBehaviour
     public void Do_Takty(Holder hold) // spocita takty
     {
         int mod = Znak.takts_per_line + 1;
-        float Pos_t = hold.Posledni.Pos_x;  // vzdalenost od prevni noty v taktech
+        float Pos_t = hold.Posledni.Pos_x + hold.Posledni.Pos_y * (Znak.takts_per_line + 1);  // vzdalenost od prevni noty v taktech
         if (Pos_t > hold.last_x)
         {
             for (int i = (int)Math.Floor(hold.last_x) + 1; i < (int)Math.Floor(Pos_t) + 1; i++)
@@ -866,6 +868,7 @@ public class Holder
     public Line_Ctrl last;
 
     public float last_x = 0;
+    public float last_y = 0;
     public int klic = 1;//(0 = houslovy, 1 = bassovy)
     
 }

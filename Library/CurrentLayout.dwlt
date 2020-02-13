@@ -111,10 +111,10 @@ MonoBehaviour:
     y: 30
     width: 1920
     height: 947
-  m_MinSize: {x: 683, y: 348}
-  m_MaxSize: {x: 12008, y: 8048}
+  m_MinSize: {x: 681, y: 348}
+  m_MaxSize: {x: 12006, y: 8048}
   vertical: 0
-  controlID: 34
+  controlID: 84
 --- !u!114 &6
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -139,7 +139,7 @@ MonoBehaviour:
   m_MinSize: {x: 406, y: 348}
   m_MaxSize: {x: 8006, y: 8048}
   vertical: 1
-  controlID: 35
+  controlID: 85
 --- !u!114 &7
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -164,7 +164,7 @@ MonoBehaviour:
   m_MinSize: {x: 406, y: 224}
   m_MaxSize: {x: 8006, y: 4024}
   vertical: 0
-  controlID: 36
+  controlID: 86
 --- !u!114 &8
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -382,9 +382,9 @@ MonoBehaviour:
   m_SceneHierarchy:
     m_TreeViewState:
       scrollPos: {x: 0, y: 0}
-      m_SelectedIDs: da110000
-      m_LastClickedID: 4570
-      m_ExpandedIDs: d4fbffff1a140000
+      m_SelectedIDs: 
+      m_LastClickedID: 0
+      m_ExpandedIDs: 4c5dffff665dffff8a5effff689dffffd4fbffff760c0000d60c00004a0d0000900d0000980d0000a00d0000280e00003c0e0000620e0000f20e0000960f00007c1000005e110000ba120000e81200003e130000721300009213000038140000da1400000e150000
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 
@@ -439,9 +439,9 @@ MonoBehaviour:
   m_isRotationLocked: 0
   m_AudioPlay: 0
   m_Position:
-    m_Target: {x: 460.72272, y: 369.88824, z: -5.5617685}
+    m_Target: {x: 550.31226, y: 240.39307, z: -8.815019}
     speed: 2
-    m_Value: {x: 460.72272, y: 369.88824, z: -5.5617685}
+    m_Value: {x: 550.31226, y: 240.39307, z: -8.815019}
   m_RenderMode: 0
   m_CameraMode:
     drawMode: 0
@@ -473,9 +473,9 @@ MonoBehaviour:
     speed: 2
     m_Value: {x: 0, y: 0, z: 0, w: -1}
   m_Size:
-    m_Target: 676.41254
+    m_Target: 952.5832
     speed: 2
-    m_Value: 676.41254
+    m_Value: 952.5832
   m_Ortho:
     m_Target: 1
     speed: 2
@@ -586,19 +586,19 @@ MonoBehaviour:
     m_ShowAllHits: 0
     m_SearchArea: 1
     m_Folders:
-    - Assets/scripts
+    - Assets/images
   m_ViewMode: 1
   m_StartGridSize: 57
   m_LastFolders:
-  - Assets/scripts
+  - Assets/images
   m_LastFoldersGridSize: 57
   m_LastProjectPath: D:\Unity\Projects\zaznamnik3
   m_LockTracker:
     m_IsLocked: 0
   m_FolderTreeState:
     scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: 0a0a0000
-    m_LastClickedID: 2570
+    m_SelectedIDs: 6c0b0000
+    m_LastClickedID: 2924
     m_ExpandedIDs: 0000000074090000
     m_RenameOverlay:
       m_UserAcceptedRename: 0

@@ -67,6 +67,9 @@ public class Screen_Ctrl : MonoBehaviour
                 change_menu.GetComponent<Change_ctrl>().Set_data(hand.get_selected());
                 change_menu.SetActive(true);
                 break;
+            case 5:// vypne aplikaci
+                Application.Quit(0);
+                break;
             default:
                 Debug.Log("unexpected value");
                 break;
