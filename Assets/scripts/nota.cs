@@ -418,19 +418,19 @@ public class Nota : Znak
         }
         gameObject.transform.position = ref_point + new Vector3(Pos_x * takt_width + (float)Math.Floor(pos_x) * cara_width, (pos_y + mod) * Hand_Ctrl.vyska_linek + vyska * nota_height, 0);
         //prevraceni
+        gameObject.transform.rotation = Quaternion.Euler(0f, 0f, 0f);    // ovlinuje vypocty ostatnich otoceni tak to resetujeme
         if (vyska > 1)
         {
-            gameObject.transform.rotation = Quaternion.Euler(0f, 0f, 180f);
-            prefix_GO.transform.position = new Vector3(-Math.Abs(prefix_GO.transform.position.x), prefix_GO.transform.position.y, prefix_GO.transform.position.z);
-            prefix_GO.transform.rotation = Quaternion.Euler(0f, 0f, 180f);
             for (int i = 0; i < prapor_GOs.GetLength(0); i++)
             {
                 prapor_GOs[i].transform.rotation = Quaternion.Euler(0f, 180f, 0f);
             }
+            gameObject.transform.rotation = Quaternion.Euler(0f, 0f, 180f);
+            prefix_GO.transform.position = new Vector3(-Math.Abs(prefix_GO.transform.position.x), prefix_GO.transform.position.y, prefix_GO.transform.position.z);
+            prefix_GO.transform.rotation = Quaternion.Euler(0f, 0f, 180f);
         }
         else
         {
-            gameObject.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
             prefix_GO.transform.position = new Vector3(Math.Abs(prefix_GO.transform.position.x), prefix_GO.transform.position.y, prefix_GO.transform.position.z);
             prefix_GO.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
             for (int i = 0; i < prapor_GOs.GetLength(0); i++)

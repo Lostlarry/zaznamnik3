@@ -182,6 +182,7 @@ public class Nota_ProtoType : MonoBehaviour
         {
             // vyska a prevraceni
             gameObject.transform.position = ref_point + new Vector3(0, vyska * Znak.nota_height);
+            gameObject.transform.rotation = Quaternion.Euler(0f, 0f, 0f);   // ovlinuje vypocty ostatnich otoceni tak to resetujeme
             if (vyska > 1)
             {
                 for (int i = 0; i < prapor_GOs.GetLength(0); i++)
@@ -194,7 +195,6 @@ public class Nota_ProtoType : MonoBehaviour
             }
             else
             {
-                gameObject.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
                 prefix_GO.transform.position = new Vector3(Math.Abs(prefix_GO.transform.position.x), prefix_GO.transform.position.y, prefix_GO.transform.position.z);
                 prefix_GO.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
                 for (int i = 0; i < prapor_GOs.GetLength(0); i++)
