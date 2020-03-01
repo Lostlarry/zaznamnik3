@@ -14,13 +14,16 @@ public class Predznamenani : MonoBehaviour
         odchylka = amount;
         if (amount > 0)
         {
-            for (int i = 0; i + 1 < amount; i++)
+            for (int i = 0; i < Becka.GetLength(0); i++)
             {
-                Krizky[i].SetActive(true);
-            }
-            for (int i = amount; i < Krizky.GetLength(0); i++)
-            {
-                Krizky[i].SetActive(false);
+                if (i < amount)
+                {
+                    Becka[i].SetActive(false);
+                }
+                else
+                {
+                    Becka[i].SetActive(true);
+                }
             }
         }
         else
@@ -33,13 +36,16 @@ public class Predznamenani : MonoBehaviour
         if (amount < 0)
         {
             amount = amount * -1;
-            for (int i = 0; i + 1 < amount; i++)
+            for (int i = 0; i < Becka.GetLength(0); i++)
             {
-                Becka[i].SetActive(true);
-            }
-            for (int i = amount; i < Becka.GetLength(0); i++)
-            {
-                Becka[i].SetActive(false);
+                if (i < amount)
+                {
+                    Becka[i].SetActive(false);
+                }
+                else
+                {
+                    Becka[i].SetActive(true);
+                }
             }
         }
         else
@@ -60,13 +66,13 @@ public class Predznamenani : MonoBehaviour
         int mod_vyska = make_positive(vyska) % 7;
         if (odchylka > (mod_vyska + 1) * 2 % 7)
         {
-            return 1;//krizek
+            return 2;//krizek blokuje becko
         }
         else if(-odchylka > make_positive((2 - mod_vyska) * 2) % 7)
         {
-            return 2;//becko
+            return 1;//becko blokuje krizek
         }
-        return 0;//nothing
+        return 3;//nothing blokuje odrazku
     }
 
 

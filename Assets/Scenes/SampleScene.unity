@@ -1718,9 +1718,9 @@ MonoBehaviour:
   pomlka: {fileID: 1137299573}
   nota: {fileID: 1240814863}
   prefix:
-  - {fileID: 325843378}
-  - {fileID: 1798053436}
   - {fileID: 1426681198}
+  - {fileID: 1798053436}
+  - {fileID: 325843378}
   prototype: {fileID: 260863457}
 --- !u!1 &199398094
 GameObject:
@@ -3485,7 +3485,6 @@ GameObject:
   m_Component:
   - component: {fileID: 325843377}
   - component: {fileID: 325843378}
-  - component: {fileID: 325843379}
   m_Layer: 5
   m_Name: odrazka
   m_TagString: Untagged
@@ -3553,7 +3552,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 558107996}
   toggleTransition: 1
   graphic: {fileID: 2031291183}
-  m_Group: {fileID: 325843379}
+  m_Group: {fileID: 0}
   onValueChanged:
     m_PersistentCalls:
       m_Calls:
@@ -3571,19 +3570,6 @@ MonoBehaviour:
     m_TypeName: UnityEngine.UI.Toggle+ToggleEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
   m_IsOn: 0
---- !u!114 &325843379
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 325843376}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: -1184210157, guid: f70555f144d8491a825f0804e09c671c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_AllowSwitchOff: 1
 --- !u!1 &338765673
 GameObject:
   m_ObjectHideFlags: 0
@@ -4140,8 +4126,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 30}
+  m_AnchoredPosition: {x: 0, y: 8}
+  m_SizeDelta: {x: 0, y: 16}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &415119853
 MonoBehaviour:
@@ -10808,6 +10794,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 892400698}
+  - component: {fileID: 892400700}
+  - component: {fileID: 892400699}
   m_Layer: 0
   m_Name: prefix
   m_TagString: Untagged
@@ -10834,6 +10822,43 @@ RectTransform:
   m_AnchoredPosition: {x: -13, y: -8.25}
   m_SizeDelta: {x: 16, y: 24}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &892400699
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 892400697}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -765806418, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
+      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  m_Sprite: {fileID: 0}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+--- !u!222 &892400700
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 892400697}
+  m_CullTransparentMesh: 0
 --- !u!1 &896138157
 GameObject:
   m_ObjectHideFlags: 0

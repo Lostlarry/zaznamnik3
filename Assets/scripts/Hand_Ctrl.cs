@@ -748,11 +748,14 @@ public class Hand_Ctrl : MonoBehaviour
         if (target != null)
         {
             Holder hold = target.master;
-            while (target != null)
+            if (target.Prev != null)
             {
-                target.Bump_pos();
-                target.Update_delka();
-                target = target.Next;
+                while (target != null)
+                {
+                    target.Bump_pos();
+                    target.Update_delka();
+                    target = target.Next;
+                }
             }
             Do_Takty(hold);
             End_HUD.Adjust_HUD(hold.Posledni);

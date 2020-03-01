@@ -157,7 +157,7 @@ public class Change_ctrl : MonoBehaviour
             swaping = true;
             if (prototype.Nota)
             {
-                int result = pred.Is_moded(prototype.Vyska, target_note.master.klic);
+                int result = pred.Is_moded(prototype.Vyska, target_note.master.klic) - 1;
                 for (int i = 0; i < prefix.GetLength(0); i++)
                 {
                     if (result == i)
