@@ -118,6 +118,11 @@ public class Znak : MonoBehaviour
         float rem_input = input;
         int tmp_delka = -1;
         int targ_post = 0;
+        int vyska = 0;
+        if (is_nota())
+        {
+            vyska = ((Nota)this).Vyska;
+        }
         for (int i = 4; i > -1; i--)// pokusi se vytvorit co nejvetsi notu nizsi nez input
         {
             if (Math.Pow(2, i) <= rem_input)
@@ -144,6 +149,10 @@ public class Znak : MonoBehaviour
             if (is_nota())
             {
                 CTRL.Add_Nota(master, this, rem_input);
+                if (vyska != 0)
+                {
+                    ((Nota)next).Vyska = vyska;
+                }
             }
             else
             {
@@ -170,6 +179,10 @@ public class Znak : MonoBehaviour
             if (is_nota())
             {
                 CTRL.Add_Nota(master, target, (float)(Math.Pow(2, Ex_delka) * (2 - Math.Pow(2, -Ex_postfix)) - input));
+                if (vyska != 0)
+                {
+                    ((Nota)target.next).Vyska = vyska;
+                }
             }
             else
             {
@@ -409,6 +422,8 @@ public class Nota : Znak
         }
     }
 
+    public int Vyska { get => vyska; set => vyska = value; }
+
     public override void Calc_Pos()// vypocita pozici noty a prevratiji pokud je nad polovinou linkovani
     {
         int mod = 0;
@@ -425,9 +440,8 @@ public class Nota : Znak
             {
                 prapor_GOs[i].transform.rotation = Quaternion.Euler(0f, 180f, 0f);
             }
+            prefix_GO.transform.rotation = Quaternion.Euler(180f, 180f, 0f);
             gameObject.transform.rotation = Quaternion.Euler(0f, 0f, 180f);
-            prefix_GO.transform.position = new Vector3(-Math.Abs(prefix_GO.transform.position.x), prefix_GO.transform.position.y, prefix_GO.transform.position.z);
-            prefix_GO.transform.rotation = Quaternion.Euler(0f, 0f, 180f);
         }
         else
         {

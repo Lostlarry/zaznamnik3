@@ -80,19 +80,23 @@ public class Change_ctrl : MonoBehaviour
         }
     }
 
-    public void Input_prefix(int index)// zmeni prefix v zavislosti na vstupu  aktivnizadny nebo pouze jeden ze vstupu
+    public void Input_prefix(int input)// zmeni prefix v zavislosti na vstupu  aktivnizadny nebo pouze jeden ze vstupu
     {
+        if (input == 0)
+        {
+            return;
+        }
         if (!swaping)
         {
             swaping = true;
-            bool state = prefix[index].isOn;
+            bool state = prefix[input - 1].isOn;
             if (state)
             {
                 if (prototype.Prefix != 0)
                 {
                     prefix[prototype.Prefix - 1].isOn = false; 
                 }
-                prototype.Prefix = index + 1;
+                prototype.Prefix = input;
             }
             else
             {

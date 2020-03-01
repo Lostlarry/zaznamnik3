@@ -14,15 +14,15 @@ public class Predznamenani : MonoBehaviour
         odchylka = amount;
         if (amount > 0)
         {
-            for (int i = 0; i < Becka.GetLength(0); i++)
+            for (int i = 0; i < Krizky.GetLength(0); i++)
             {
                 if (i < amount)
                 {
-                    Becka[i].SetActive(false);
+                    Krizky[i].SetActive(true);
                 }
                 else
                 {
-                    Becka[i].SetActive(true);
+                    Krizky[i].SetActive(false);
                 }
             }
         }
@@ -40,11 +40,11 @@ public class Predznamenani : MonoBehaviour
             {
                 if (i < amount)
                 {
-                    Becka[i].SetActive(false);
+                    Becka[i].SetActive(true);
                 }
                 else
                 {
-                    Becka[i].SetActive(true);
+                    Becka[i].SetActive(false);
                 }
             }
         }

@@ -15,6 +15,7 @@ public class Nota_ProtoType : MonoBehaviour
     public GameObject topfix_GO;
     public GameObject[] postfix_GO;
 
+
     public GameObject carka_licha;
     public GameObject carka_suda;
     GameObject[] carky;
@@ -189,13 +190,11 @@ public class Nota_ProtoType : MonoBehaviour
                 {
                     prapor_GOs[i].transform.rotation = Quaternion.Euler(0f, 180f, 0f);
                 }
+                prefix_GO.transform.rotation = Quaternion.Euler(180f, 180f, 0f);
                 gameObject.transform.rotation = Quaternion.Euler(0f, 0f, 180f);
-                prefix_GO.transform.position = new Vector3(-Math.Abs(prefix_GO.transform.position.x), prefix_GO.transform.position.y, prefix_GO.transform.position.z);
-                prefix_GO.transform.rotation = Quaternion.Euler(0f, 0f, 180f);
             }
             else
             {
-                prefix_GO.transform.position = new Vector3(Math.Abs(prefix_GO.transform.position.x), prefix_GO.transform.position.y, prefix_GO.transform.position.z);
                 prefix_GO.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
                 for (int i = 0; i < prapor_GOs.GetLength(0); i++)
                 {
